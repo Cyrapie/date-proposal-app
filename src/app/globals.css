@@ -1,0 +1,325 @@
+@import "tailwindcss";
+
+/* Mode sombre piloté par la classe `.dark` sur <html>, pas par la préférence
+   système seule : un bouton de bascule doit pouvoir la contredire. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   Design system
+   Crème et bordeaux profond. Titres en Playfair Display, texte en Inter.
+
+   Les tokens crème/encre changent de valeur en mode sombre, ce qui bascule
+   d'un coup la vitrine et le dashboard sans réécrire chaque classe.
+   Le parcours destinataire n'est pas concerné : il consomme les variables
+   `--theme-*` du thème choisi à la création de l'invitation.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --c-cream-50: #fffdf9;
+  --c-cream-100: #faf6f0;
+  --c-cream-200: #f2ebe0;
+  --c-cream-300: #e6dbcd;
+
+  --c-ink-900: #2a2320;
+  --c-ink-600: #574a43;
+  --c-ink-400: #7d6f66;
+
+  /* Nuances employées comme fonds discrets ou bordures. */
+  --c-bordeaux-50: #f7ecee;
+  --c-bordeaux-100: #f2e3e5;
+  --c-bordeaux-200: #e7c4cb;
+  /* Nuances employées comme couleur de texte : elles doivent rester
+     lisibles sur le fond courant, donc elles s'éclaircissent en sombre. */
+  --c-bordeaux-400: #a83049;
+  --c-bordeaux-500: #8d2438;
+  --c-bordeaux-600: #6d1b2c;
+  --c-bordeaux-700: #551321;
+  --c-bordeaux-800: #3d0d17;
+
+  /* Aplat d'accent : toujours bordeaux profond, texte toujours clair, dans
+     les deux modes. Sinon les boutons pleins s'inversent en sombre. */
+  --c-accent: #6d1b2c;
+  --c-accent-hover: #551321;
+  --c-accent-ink: #fffdf9;
+
+  /* Marques de graphique (tableau de bord admin), validées avec le script de
+     la compétence dataviz : bande de clarté OKLCH, plancher de chroma, et
+     séparation CVD ≥ 8 pour la paire. Distinctes des tokens de texte
+     ci-dessus, dont les contraintes de contraste sont différentes. */
+  --c-chart-primary: #a83049;
+  --c-chart-secondary: #0d8aa3;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --c-cream-50: #211c1f;
+  --c-cream-100: #161113;
+  --c-cream-200: #2b2427;
+  --c-cream-300: #3b3135;
+
+  --c-ink-900: #f7f2ee;
+  --c-ink-600: #d0c4be;
+  --c-ink-400: #9a8c86;
+
+  --c-bordeaux-50: #33202a;
+  --c-bordeaux-100: #3d2732;
+  --c-bordeaux-200: #5c3846;
+  --c-bordeaux-400: #f08fa4;
+  --c-bordeaux-500: #e57a92;
+  --c-bordeaux-600: #dd6a84;
+  --c-bordeaux-700: #cf5271;
+  --c-bordeaux-800: #b93d5c;
+
+  --c-accent: #a3283f;
+  --c-accent-hover: #b93d5c;
+  --c-accent-ink: #fffdf9;
+
+  /* Revalidées pour la bande de clarté sombre (0.48–0.67) : les nuances
+     claires ci-dessus sont pensées pour du texte, pas pour des barres. */
+  --c-chart-primary: #c23a56;
+  --c-chart-secondary: #1f95ae;
+}
+
+@theme inline {
+  --color-cream-50: var(--c-cream-50);
+  --color-cream-100: var(--c-cream-100);
+  --color-cream-200: var(--c-cream-200);
+  --color-cream-300: var(--c-cream-300);
+
+  --color-ink-900: var(--c-ink-900);
+  --color-ink-600: var(--c-ink-600);
+  --color-ink-400: var(--c-ink-400);
+
+  --color-bordeaux-50: var(--c-bordeaux-50);
+  --color-bordeaux-100: var(--c-bordeaux-100);
+  --color-bordeaux-200: var(--c-bordeaux-200);
+  --color-bordeaux-400: var(--c-bordeaux-400);
+  --color-bordeaux-500: var(--c-bordeaux-500);
+  --color-bordeaux-600: var(--c-bordeaux-600);
+  --color-bordeaux-700: var(--c-bordeaux-700);
+  --color-bordeaux-800: var(--c-bordeaux-800);
+
+  --color-accent: var(--c-accent);
+  --color-accent-hover: var(--c-accent-hover);
+  --color-accent-ink: var(--c-accent-ink);
+
+  --color-chart-primary: var(--c-chart-primary);
+  --color-chart-secondary: var(--c-chart-secondary);
+
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 20px;
+  --radius-vitrine: 24px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--c-cream-100);
+  color: var(--c-ink-900);
+  font-family: var(--font-sans);
+  /* Mobile-first : évite le rebond horizontal sur les écrans étroits. */
+  overflow-x: hidden;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+/* Les écrans du parcours destinataire consomment les tokens du thème choisi,
+   injectés en variables CSS inline sur le conteneur racine. Ils ignorent
+   volontairement le mode sombre. */
+.themed {
+  background: var(--theme-bg);
+  color: var(--theme-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Dégradés
+   Le bandeau d'appel à l'action reste sombre dans les deux modes : c'est une
+   affiche, pas une surface de lecture.
+   -------------------------------------------------------------------------- */
+.gradient-bordeaux {
+  background-image: linear-gradient(135deg, #3d0d17 0%, #6d1b2c 50%, #a83049 100%);
+}
+
+.gradient-text {
+  background-image: linear-gradient(
+    115deg,
+    var(--c-bordeaux-600) 0%,
+    var(--c-bordeaux-400) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Bandeau d'en-tête de page, teinté et discret. */
+.entete-page {
+  background-image: linear-gradient(
+    160deg,
+    var(--c-bordeaux-50) 0%,
+    var(--c-cream-100) 70%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Blocs
+   Le survol change la couleur du bloc. Deux intensités.
+   -------------------------------------------------------------------------- */
+.bloc {
+  background: var(--c-cream-50);
+  border: 1px solid var(--c-cream-300);
+  border-radius: var(--radius-vitrine);
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.bloc:hover {
+  background: var(--c-bordeaux-50);
+  border-color: var(--c-bordeaux-200);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(109, 27, 44, 0.12);
+}
+
+/* Variante pleine : le bloc bascule entièrement en bordeaux. */
+.bloc-plein:hover {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+}
+
+.bloc-plein:hover :is(h3, p, dt, dd, span:not([data-fixe])) {
+  color: var(--c-accent-ink);
+}
+
+/* La pastille s'inverse : fond clair, contenu bordeaux. Sans cette règle de
+   couleur, un chiffre clair resterait invisible sur la pastille éclaircie. */
+.pastille {
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.bloc-plein:hover .pastille {
+  background: var(--c-accent-ink);
+  color: var(--c-accent);
+  transform: rotate(-6deg) scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bloc:hover,
+  .bloc-plein:hover .pastille {
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Masque la barre de défilement des sélecteurs horizontaux (mobile). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================================================
+   Corps des articles de blog (HTML issu du Markdown).
+   ========================================================================== */
+.prose-invitation {
+  color: var(--c-ink-600);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.prose-invitation > * + * {
+  margin-top: 1.25em;
+}
+
+.prose-invitation h2 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1.25;
+  color: var(--c-ink-900);
+  margin-top: 2.25em;
+}
+
+.prose-invitation h3 {
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--c-ink-900);
+  margin-top: 1.75em;
+}
+
+.prose-invitation strong {
+  color: var(--c-ink-900);
+  font-weight: 600;
+}
+
+.prose-invitation a {
+  color: var(--c-bordeaux-600);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prose-invitation ul,
+.prose-invitation ol {
+  padding-left: 1.5em;
+}
+
+.prose-invitation ul {
+  list-style: disc;
+}
+.prose-invitation ol {
+  list-style: decimal;
+}
+
+.prose-invitation li + li {
+  margin-top: 0.5em;
+}
+
+.prose-invitation blockquote {
+  border-left: 3px solid var(--c-bordeaux-500);
+  padding: 0.25em 0 0.25em 1.25em;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--c-ink-900);
+}
+
+.prose-invitation code {
+  background: var(--c-cream-200);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+
+.prose-invitation hr {
+  border: 0;
+  border-top: 1px solid var(--c-cream-300);
+  margin: 2.5em 0;
+}
+
+.prose-invitation img {
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
