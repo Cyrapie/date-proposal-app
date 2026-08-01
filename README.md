@@ -7,6 +7,27 @@ animée, choisit son lieu et son créneau, et accepte. Les deux reçoivent un
 fichier `.ics` et un lien Google Calendar pré-rempli ; le créateur est notifié
 par email avec le récapitulatif complet.
 
+## État actuel
+
+Au-delà du parcours créateur/destinataire décrit plus bas, le dépôt contient
+aussi :
+
+- **Site vitrine** (`src/app/(marketing)/`) — accueil, `/tarifs` (formules
+  free/premium/gold, XOF et EUR), blog en Markdown (`content/blog/`),
+  `/contact` et `/partenaires` (formulaires protégés par Cloudflare Turnstile),
+  `/a-propos`.
+- **Géolocalisation des lieux** — un créateur peut relever la position d'un
+  lieu depuis son navigateur (`src/components/dashboard/LocationPicker.tsx`),
+  transmise au destinataire sous forme de lien Maps.
+- **Contre-proposition de date** — si aucun créneau proposé ne convient, le
+  destinataire peut en soumettre un autre (statut `countered`).
+- **Quotas et tableau de bord Super Admin** (`/admin`) — KPIs, croissance,
+  liste des créateurs, changement manuel de formule. Réservé aux comptes avec
+  `users.is_super_admin = true` (attribué en base, jamais via l'interface).
+
+Pas encore fait : intégration de paiement réelle (voir « Prêt pour Stripe »
+plus bas).
+
 ## Stack
 
 | Rôle | Choix |
@@ -33,12 +54,17 @@ npm install
 ### 2. Projet Supabase
 
 Créez un projet sur [supabase.com](https://supabase.com), puis appliquez les
-trois migrations de `supabase/migrations/` **dans l'ordre**. Le plus simple est
-de les coller dans le SQL Editor du tableau de bord :
+migrations de `supabase/migrations/` **dans l'ordre** (le fichier
+`supabase/migrations-combined.sql` les concatène déjà dans le bon ordre, pour
+un simple copier-coller dans le SQL Editor) :
 
 1. `20260730120000_init.sql` — tables, contraintes, trigger d'inscription, fonction de purge
 2. `20260730120100_rls.sql` — Row Level Security
 3. `20260730120200_storage.sql` — bucket `proposal-photos` et ses policies
+4. `20260730120300_harden_rpc_grants_and_storage.sql` — durcissement des RPC et du bucket
+5. `20260731090000_counter_proposal_and_geolocation.sql` — contre-proposition de date, coordonnées de lieu
+6. `20260731100000_align_plan_names_and_quota.sql` — formules `free`/`premium`/`gold`, quota mensuel
+7. `20260801090000_super_admin_and_stats.sql` — drapeau super-admin, agrégats du tableau de bord
 
 Avec la CLI Supabase, depuis un projet lié :
 
@@ -66,6 +92,10 @@ Renseignez au minimum les trois clés Supabase (`Project Settings → API`) :
 `RESEND_API_KEY` est **facultative en local** : sans elle, les emails sont
 journalisés dans la console au lieu d'être envoyés, et le reste du parcours
 fonctionne normalement.
+
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY` et `TURNSTILE_SECRET_KEY` sont également
+facultatives : sans elles, la vérification anti-robot des formulaires Contact
+et Devenir partenaire est neutralisée plutôt que de bloquer l'envoi.
 
 ### 4. Lancer
 
@@ -138,9 +168,11 @@ Deux écarts assumés par rapport au brief, tous deux additifs :
   stockée nulle part. Le champ est facultatif : il est proposé sur l'écran de
   sélection, et l'email n'est envoyé que s'il est renseigné.
 
-Le champ `users.plan` existe dès maintenant. Sa contrainte accepte déjà
-`free`, `pro` et `lifetime`, afin qu'activer un modèle payant ne demande
-**aucune migration de schéma**. Seul `free` est utilisé aujourd'hui.
+Le champ `users.plan` accepte `free`, `premium` et `gold` — les trois formules
+de `/tarifs`. Un quota mensuel d'invitations est appliqué côté serveur selon
+la formule (voir `src/lib/data/quota.ts`) ; son dépassement renvoie une 402.
+Le changement de formule est aujourd'hui **manuel**, via le tableau de bord
+Super Admin (`/admin`) — aucun paiement réel n'est branché.
 
 ## Sécurité
 
