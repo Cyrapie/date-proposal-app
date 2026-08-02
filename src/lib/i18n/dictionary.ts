@@ -421,7 +421,7 @@ const fr = {
         paragraphs: [
           "Le service est édité par l'éditeur de cette application, responsable du traitement au sens du RGPD. Pour toute question ou demande, écrivez à l'adresse de contact indiquée en bas de page.",
         ],
-        note: "Contact : renseignez ici l'adresse email du responsable de traitement avant mise en production, ainsi que la raison sociale et l'adresse de l'éditeur.",
+        note: "Contact : keerelle.app@gmail.com. Raison sociale, forme juridique et adresse du siège de l'éditeur à renseigner ici avant mise en production.",
       },
       {
         id: 'donnees-collectees',
@@ -508,8 +508,7 @@ const fr = {
       {
         id: 'contact',
         title: 'Contact',
-        paragraphs: ["Pour toute question relative à ce site, une adresse de contact est à renseigner ici avant mise en production."],
-        note: 'En attendant, écrivez-nous depuis la page Contact du site : votre message nous parvient directement.',
+        paragraphs: ["Pour toute question relative à ce site : keerelle.app@gmail.com, ou depuis la page Contact du site."],
       },
     ],
   },
@@ -594,8 +593,9 @@ const fr = {
       {
         id: 'signalement',
         title: 'Signalement',
-        paragraphs: ["Un destinataire qui reçoit une invitation abusive peut le signaler via la page /contact."],
-        note: 'Adresse dédiée au signalement à préciser ici avant mise en production.',
+        paragraphs: [
+          "Un destinataire qui reçoit une invitation abusive peut le signaler via la page /contact, ou directement à keerelle.app@gmail.com.",
+        ],
       },
       {
         id: 'sanctions',
@@ -1020,7 +1020,7 @@ const en: typeof fr = {
         paragraphs: [
           'The service is published by this application’s publisher, the data controller within the meaning of the GDPR. For any question or request, write to the contact address shown at the bottom of the page.',
         ],
-        note: 'Contact: fill in the data controller’s email address here before going to production, along with the publisher’s legal name and address.',
+        note: 'Contact: keerelle.app@gmail.com. The publisher’s legal name, company form and registered address are still to be filled in here before going to production.',
       },
       {
         id: 'donnees-collectees',
@@ -1105,8 +1105,7 @@ const en: typeof fr = {
       {
         id: 'contact',
         title: 'Contact',
-        paragraphs: ['For any question about this site, a contact address is to be filled in here before going to production.'],
-        note: 'In the meantime, reach us through the site’s Contact page: your message comes straight to us.',
+        paragraphs: ['For any question about this site: keerelle.app@gmail.com, or through the site’s Contact page.'],
       },
     ],
   },
@@ -1189,8 +1188,9 @@ const en: typeof fr = {
       {
         id: 'signalement',
         title: 'Reporting',
-        paragraphs: ['A recipient who gets an abusive invitation can report it via the /contact page.'],
-        note: 'A dedicated reporting address is to be specified here before going to production.',
+        paragraphs: [
+          'A recipient who gets an abusive invitation can report it via the /contact page, or directly at keerelle.app@gmail.com.',
+        ],
       },
       {
         id: 'sanctions',
