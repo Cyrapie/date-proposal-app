@@ -66,10 +66,24 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <p className="mt-12 border-t border-cream-300 pt-6 text-xs text-ink-400">
-          © {new Date().getFullYear()} Une invitation. Aucune connexion à votre agenda : les
-          rendez-vous sont transmis par fichier .ics.
-        </p>
+        <div className="mt-12 flex flex-col gap-3 border-t border-cream-300 pt-6 text-xs text-ink-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Otyche</p>
+
+          <nav aria-label="Mentions légales" className="flex flex-wrap gap-x-5 gap-y-2">
+            <Link href="/privacy" className="transition hover:text-bordeaux-500">
+              Politique de confidentialité
+            </Link>
+            <Link href="/regles-communaute" className="transition hover:text-bordeaux-500">
+              Règles de la communauté
+            </Link>
+            <Link href="/conditions-generales" className="transition hover:text-bordeaux-500">
+              Conditions générales
+            </Link>
+            <Link href="/mentions-legales" className="transition hover:text-bordeaux-500">
+              Mentions légales
+            </Link>
+          </nav>
+        </div>
       </div>
     </footer>
   );
