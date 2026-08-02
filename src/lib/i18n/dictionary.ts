@@ -421,7 +421,7 @@ const fr = {
         paragraphs: [
           "Le service est édité par l'éditeur de cette application, responsable du traitement au sens du RGPD. Pour toute question ou demande, écrivez à l'adresse de contact indiquée en bas de page.",
         ],
-        note: "Contact : keerelle.app@gmail.com. Raison sociale, forme juridique et adresse du siège de l'éditeur à renseigner ici avant mise en production.",
+        note: "Contact : keerelle.app@gmail.com. Éditeur : Ets Otyche, RCCM n° RB/ABC/18 A 9673, IFU 0202214123481, Cotonou, Bénin.",
       },
       {
         id: 'donnees-collectees',
@@ -490,13 +490,8 @@ const fr = {
         id: 'editeur',
         title: 'Éditeur',
         paragraphs: [
-          "Le service « Keerelle » est édité par Otyche. Raison sociale, forme juridique, adresse du siège et numéro d'immatriculation à renseigner ici avant mise en production.",
+          "Le service « Keerelle » est édité par Ets Otyche (établissement), RCCM n° RB/ABC/18 A 9673, IFU 0202214123481, dont le siège est à Cotonou, Bénin.",
         ],
-      },
-      {
-        id: 'directeur-publication',
-        title: 'Directeur de publication',
-        paragraphs: ["Nom et contact du directeur de publication à renseigner ici avant mise en production."],
       },
       {
         id: 'hebergement',
@@ -1020,7 +1015,7 @@ const en: typeof fr = {
         paragraphs: [
           'The service is published by this application’s publisher, the data controller within the meaning of the GDPR. For any question or request, write to the contact address shown at the bottom of the page.',
         ],
-        note: 'Contact: keerelle.app@gmail.com. The publisher’s legal name, company form and registered address are still to be filled in here before going to production.',
+        note: 'Contact: keerelle.app@gmail.com. Publisher: Ets Otyche, business register no. RCCM RB/ABC/18 A 9673, tax ID (IFU) 0202214123481, Cotonou, Benin.',
       },
       {
         id: 'donnees-collectees',
@@ -1089,13 +1084,8 @@ const en: typeof fr = {
         id: 'editeur',
         title: 'Publisher',
         paragraphs: [
-          'The “Keerelle” service is published by Otyche. Legal name, company form, registered address and registration number to be filled in here before going to production.',
+          'The “Keerelle” service is published by Ets Otyche (sole proprietorship), business register no. RCCM RB/ABC/18 A 9673, tax ID (IFU) 0202214123481, registered in Cotonou, Benin.',
         ],
-      },
-      {
-        id: 'directeur-publication',
-        title: 'Publication director',
-        paragraphs: ['Name and contact details of the publication director to be filled in here before going to production.'],
       },
       {
         id: 'hebergement',
