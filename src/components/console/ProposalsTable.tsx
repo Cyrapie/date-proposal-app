@@ -136,6 +136,14 @@ export function ProposalsTable({ proposals }: { proposals: ConsoleProposal[] }) 
                         Expirée
                       </span>
                     ) : null}
+                    {proposal.audience === 'group' ? (
+                      <span className="mt-1 block text-[11px] font-semibold text-bordeaux-600">
+                        Groupe · {proposal.confirmedCount}/{proposal.groupCapacity}
+                        {proposal.waitlistedCount > 0
+                          ? ` · ${proposal.waitlistedCount} attente`
+                          : ''}
+                      </span>
+                    ) : null}
                   </td>
 
                   <td className="px-4 py-3 text-ink-600">{formatShortDate(proposal.expiresAt)}</td>

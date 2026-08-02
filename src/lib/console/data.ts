@@ -27,6 +27,10 @@ export type ConsoleProposal = {
   recipientName: string;
   type: string;
   status: string;
+  audience: 'individual' | 'group';
+  groupCapacity: number | null;
+  confirmedCount: number;
+  waitlistedCount: number;
   creatorEmail: string;
   viewedAt: string | null;
   expiresAt: string;
@@ -118,6 +122,10 @@ export async function listConsoleProposals(): Promise<ConsoleProposal[]> {
       recipient_name: string;
       type: string;
       status: string;
+      audience: 'individual' | 'group';
+      group_capacity: number | null;
+      confirmed_count: number;
+      waitlisted_count: number;
       creator_email: string;
       viewed_at: string | null;
       expires_at: string;
@@ -130,6 +138,10 @@ export async function listConsoleProposals(): Promise<ConsoleProposal[]> {
     recipientName: row.recipient_name,
     type: row.type,
     status: row.status,
+    audience: row.audience,
+    groupCapacity: row.group_capacity,
+    confirmedCount: Number(row.confirmed_count),
+    waitlistedCount: Number(row.waitlisted_count),
     creatorEmail: row.creator_email,
     viewedAt: row.viewed_at,
     expiresAt: row.expires_at,

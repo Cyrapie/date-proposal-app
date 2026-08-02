@@ -61,6 +61,7 @@ export const PLAN_TIERS: PlanTier[] = [
     features: [
       "Jusqu'à 50 invitations par mois",
       'Tout ce que contient Premium',
+      'Invitations de groupe, avec liste d’attente',
       'Suppression de la mention de bas de page',
       'Statistiques d’ouverture détaillées',
       'Accès anticipé aux nouveautés',
@@ -71,6 +72,11 @@ export const PLAN_TIERS: PlanTier[] = [
 /** Formule par identifiant. Retombe sur la gratuite si l'identifiant est inconnu. */
 export function planFor(id: PlanId): PlanTier {
   return PLAN_TIERS.find((tier) => tier.id === id) ?? PLAN_TIERS[0];
+}
+
+/** Les invitations de groupe (capacité, liste d'attente) sont réservées à Premium Gold. */
+export function canCreateGroupInvitations(plan: PlanId): boolean {
+  return plan === 'gold';
 }
 
 /** Conversion exacte vers l'euro, arrondie au centime. */

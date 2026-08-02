@@ -6,12 +6,13 @@ import { useEffect, useState } from 'react';
 import { ConfirmationScreen } from '@/components/recipient/ConfirmationScreen';
 import { DecisionScreen } from '@/components/recipient/DecisionScreen';
 import { EnvelopeScreen } from '@/components/recipient/EnvelopeScreen';
+import { GroupRsvpScreen } from '@/components/recipient/GroupRsvpScreen';
 import { LetterScreen } from '@/components/recipient/LetterScreen';
 import { SelectionScreen, type SelectionPayload } from '@/components/recipient/SelectionScreen';
 import type { ConfirmedResponse, PublicProposal } from '@/components/recipient/types';
 import { themeStyle } from '@/lib/domain/themes';
 
-type Step = 'envelope' | 'letter' | 'decision' | 'selection' | 'confirmation';
+type Step = 'envelope' | 'letter' | 'decision' | 'group-rsvp' | 'selection' | 'confirmation';
 
 export function RecipientExperience({
   proposal,
@@ -62,6 +63,9 @@ export function RecipientExperience({
         note: payload.note || null,
         icsUrl: '#',
         googleCalendarUrl: '#',
+        group: proposal.group
+          ? { status: 'confirmed', capacity: proposal.group.capacity }
+          : undefined,
       });
       setStep('confirmation');
       setSubmitting(false);
@@ -98,7 +102,11 @@ export function RecipientExperience({
         ) : null}
 
         {step === 'letter' ? (
-          <LetterScreen key="letter" proposal={proposal} onContinue={() => setStep('decision')} />
+          <LetterScreen
+            key="letter"
+            proposal={proposal}
+            onContinue={() => setStep(proposal.group ? 'group-rsvp' : 'decision')}
+          />
         ) : null}
 
         {step === 'decision' ? (
@@ -106,6 +114,15 @@ export function RecipientExperience({
             key="decision"
             recipientName={proposal.recipientName}
             onYes={() => setStep('selection')}
+          />
+        ) : null}
+
+        {step === 'group-rsvp' && proposal.group ? (
+          <GroupRsvpScreen
+            key="group-rsvp"
+            recipientName={proposal.recipientName}
+            group={proposal.group}
+            onJoin={() => setStep('selection')}
           />
         ) : null}
 

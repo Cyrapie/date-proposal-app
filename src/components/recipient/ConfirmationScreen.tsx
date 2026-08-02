@@ -8,6 +8,8 @@ import type { ConfirmedResponse } from '@/components/recipient/types';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 export function ConfirmationScreen({ response }: { response: ConfirmedResponse }) {
+  const waitlisted = response.group?.status === 'waitlisted';
+
   return (
     <motion.div
       key="confirmation"
@@ -34,8 +36,24 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
           className="text-center font-serif text-4xl leading-tight"
           style={{ color: 'var(--theme-accent)' }}
         >
-          {response.countered ? 'Bien reçu' : 'Parfait'}
+          {waitlisted ? "Vous êtes sur la liste" : response.countered ? 'Bien reçu' : 'Parfait'}
         </motion.h1>
+
+        {waitlisted ? (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mt-3 text-center text-sm"
+            style={{ color: 'var(--theme-muted)' }}
+          >
+            Toutes les places sont prises pour l&apos;instant
+            {response.group?.waitlistPosition
+              ? ` — vous êtes en position ${response.group.waitlistPosition}`
+              : ''}
+            . Vous serez prévenu par email si une place se libère.
+          </motion.p>
+        ) : null}
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -101,37 +119,39 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
           </dl>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.6 }}
-          className="mt-6 space-y-3"
-        >
-          <a
-            href={response.icsUrl}
-            download
-            className="block w-full rounded-full px-6 py-4 text-center text-base font-medium transition active:scale-[0.99]"
-            style={{
-              background: 'var(--theme-accent)',
-              color: 'var(--theme-accent-ink)',
-            }}
+        {waitlisted ? null : (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, duration: 0.6 }}
+            className="mt-6 space-y-3"
           >
-            Ajouter à mon calendrier
-          </a>
+            <a
+              href={response.icsUrl}
+              download
+              className="block w-full rounded-full px-6 py-4 text-center text-base font-medium transition active:scale-[0.99]"
+              style={{
+                background: 'var(--theme-accent)',
+                color: 'var(--theme-accent-ink)',
+              }}
+            >
+              Ajouter à mon calendrier
+            </a>
 
-          <a
-            href={response.googleCalendarUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full rounded-full border px-6 py-3.5 text-center text-sm font-medium transition active:scale-[0.99]"
-            style={{
-              borderColor: 'var(--theme-border)',
-              color: 'var(--theme-muted)',
-            }}
-          >
-            Ouvrir dans Google Calendar
-          </a>
-        </motion.div>
+            <a
+              href={response.googleCalendarUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-full border px-6 py-3.5 text-center text-sm font-medium transition active:scale-[0.99]"
+              style={{
+                borderColor: 'var(--theme-border)',
+                color: 'var(--theme-muted)',
+              }}
+            >
+              Ouvrir dans Google Calendar
+            </a>
+          </motion.div>
+        )}
 
         <motion.p
           initial={{ opacity: 0 }}

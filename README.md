@@ -1,4 +1,10 @@
-# Une invitation pour toi
+# Keerelle
+
+*« Keerelle, la clé qui ouvre un moment. »* — le nom se lit « Key » dès la
+première syllabe (positionnement anglophone/international dès l'oreille), et
+sa terminaison en « -erelle » évoque en filigrane un petit messager ailé
+(hirondelle, tourterelle) : on peut jouer sur les deux registres en
+copywriting, mais l'angle de la clé reste le principal.
 
 Application de proposition de rendez-vous personnalisée. Le créateur compose une
 invitation (occasion, message, photo, lieux, créneaux, thème) et obtient un lien

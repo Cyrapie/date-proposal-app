@@ -490,7 +490,7 @@ const fr = {
         id: 'editeur',
         title: 'Éditeur',
         paragraphs: [
-          "Le service « Une invitation » est édité par Otyche. Raison sociale, forme juridique, adresse du siège et numéro d'immatriculation à renseigner ici avant mise en production.",
+          "Le service « Keerelle » est édité par Otyche. Raison sociale, forme juridique, adresse du siège et numéro d'immatriculation à renseigner ici avant mise en production.",
         ],
       },
       {
@@ -524,7 +524,7 @@ const fr = {
         id: 'objet',
         title: 'Objet',
         paragraphs: [
-          "Les présentes conditions régissent l'utilisation du service « Une invitation », qui permet à un créateur de composer une invitation personnalisée et d'obtenir un lien à transmettre à un destinataire.",
+          "Les présentes conditions régissent l'utilisation du service « Keerelle », qui permet à un créateur de composer une invitation personnalisée et d'obtenir un lien à transmettre à un destinataire.",
         ],
         note: 'En créant un compte ou en utilisant le service, vous acceptez les termes de ces conditions générales.',
       },
@@ -850,6 +850,7 @@ const en: typeof fr = {
         features: [
           'Up to 50 invitations per month',
           'Everything in Premium',
+          'Group invitations, with a waitlist',
           'Footer mention removed',
           'Detailed open-rate statistics',
           'Early access to new features',
@@ -1088,7 +1089,7 @@ const en: typeof fr = {
         id: 'editeur',
         title: 'Publisher',
         paragraphs: [
-          'The “Une invitation” service is published by Otyche. Legal name, company form, registered address and registration number to be filled in here before going to production.',
+          'The “Keerelle” service is published by Otyche. Legal name, company form, registered address and registration number to be filled in here before going to production.',
         ],
       },
       {
@@ -1120,7 +1121,7 @@ const en: typeof fr = {
         id: 'objet',
         title: 'Purpose',
         paragraphs: [
-          'These terms govern the use of the “Une invitation” service, which lets a creator compose a personalised invitation and obtain a link to send to a recipient.',
+          'These terms govern the use of the “Keerelle” service, which lets a creator compose a personalised invitation and obtain a link to send to a recipient.',
         ],
         note: 'By creating an account or using the service, you accept the terms of this agreement.',
       },

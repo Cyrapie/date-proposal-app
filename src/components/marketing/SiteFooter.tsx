@@ -16,7 +16,7 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <div className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-bordeaux-500" />
-              <span className="font-serif text-lg text-ink-900">Une invitation</span>
+              <span className="font-serif text-lg text-ink-900">Keerelle</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-ink-400">{t.footer.tagline}</p>
           </div>

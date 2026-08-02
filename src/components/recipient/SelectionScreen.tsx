@@ -17,6 +17,8 @@ export type SelectionPayload = {
   proposedStart: string | null;
   proposedEnd: string | null;
   proposedLocation: string;
+  /** Demandé uniquement sur une invitation de groupe. */
+  participantName: string;
 };
 
 export function SelectionScreen({
@@ -38,6 +40,8 @@ export function SelectionScreen({
   const [slotId, setSlotId] = useState<string>(proposal.slots[0]?.id ?? '');
   const [note, setNote] = useState('');
   const [email, setEmail] = useState('');
+  const [participantName, setParticipantName] = useState('');
+  const isGroup = proposal.audience === 'group';
 
   // Contre-proposition : aucun créneau offert ne convient.
   const [autreDate, setAutreDate] = useState(false);
@@ -81,11 +85,13 @@ export function SelectionScreen({
               proposedStart: debutIso,
               proposedEnd: finIso,
               proposedLocation: lieuPropose.trim(),
+              participantName: participantName.trim(),
             });
             return;
           }
 
           if (!slotId) return;
+          if (isGroup && !participantName.trim()) return;
           onSubmit({
             locationId,
             slotId,
@@ -94,6 +100,7 @@ export function SelectionScreen({
             proposedStart: null,
             proposedEnd: null,
             proposedLocation: '',
+            participantName: participantName.trim(),
           });
         }}
       >
@@ -111,6 +118,32 @@ export function SelectionScreen({
             À toi de choisir
           </h1>
         </header>
+
+        {isGroup ? (
+          <div className="space-y-2">
+            <label
+              htmlFor="participant-name"
+              className="block text-sm font-medium"
+              style={{ color: 'var(--theme-muted)' }}
+            >
+              Ton prénom
+            </label>
+            <input
+              id="participant-name"
+              value={participantName}
+              onChange={(event) => setParticipantName(event.target.value)}
+              required
+              maxLength={60}
+              placeholder="Pour qu'on te reconnaisse dans la liste"
+              className="w-full rounded-2xl border p-4 text-base outline-none transition focus:ring-2"
+              style={{
+                background: 'var(--theme-surface)',
+                borderColor: 'var(--theme-border)',
+                color: 'var(--theme-ink)',
+              }}
+            />
+          </div>
+        ) : null}
 
         {offerLocations ? (
           <fieldset className="space-y-3">
@@ -192,22 +225,24 @@ export function SelectionScreen({
             );
           })}
 
-          <label
-            className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed p-4 transition"
-            style={{
-              background: autreDate ? 'var(--theme-accent-soft)' : 'transparent',
-              borderColor: autreDate ? 'var(--theme-accent)' : 'var(--theme-border)',
-              color: 'var(--theme-ink)',
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={autreDate}
-              onChange={(event) => setAutreDate(event.target.checked)}
-              className="h-4 w-4 shrink-0 accent-[var(--theme-accent)]"
-            />
-            <span className="font-medium">Aucun ne me va, je propose autre chose</span>
-          </label>
+          {isGroup ? null : (
+            <label
+              className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed p-4 transition"
+              style={{
+                background: autreDate ? 'var(--theme-accent-soft)' : 'transparent',
+                borderColor: autreDate ? 'var(--theme-accent)' : 'var(--theme-border)',
+                color: 'var(--theme-ink)',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={autreDate}
+                onChange={(event) => setAutreDate(event.target.checked)}
+                className="h-4 w-4 shrink-0 accent-[var(--theme-accent)]"
+              />
+              <span className="font-medium">Aucun ne me va, je propose autre chose</span>
+            </label>
+          )}
 
           {autreDate ? (
             <div
@@ -354,7 +389,11 @@ export function SelectionScreen({
 
         <button
           type="submit"
-          disabled={submitting || (autreDate ? !contrePropositionComplete : !slotId)}
+          disabled={
+            submitting ||
+            (autreDate ? !contrePropositionComplete : !slotId) ||
+            (isGroup && !participantName.trim())
+          }
           className="w-full rounded-full px-8 py-4 text-lg font-medium shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition active:scale-[0.99] disabled:opacity-60"
           style={{
             background: 'var(--theme-accent)',

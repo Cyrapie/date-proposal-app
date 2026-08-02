@@ -1,7 +1,7 @@
-import { PROPOSAL_TYPE_META, type ProposalType } from '@/lib/domain/proposal';
+import { anyTypeMeta, type AnyProposalType } from '@/lib/domain/proposal';
 
 export type GoogleCalendarInput = {
-  type: ProposalType;
+  type: AnyProposalType;
   recipientName: string;
   start: Date;
   end: Date;
@@ -27,7 +27,7 @@ export function googleCalendarUrl(input: GoogleCalendarInput): string {
 
   const params = new URLSearchParams({
     action: 'TEMPLATE',
-    text: `${PROPOSAL_TYPE_META[input.type].calendarSummary} avec ${input.recipientName}`,
+    text: `${anyTypeMeta(input.type).calendarSummary} avec ${input.recipientName}`,
     dates: `${formatGoogleDate(input.start)}/${formatGoogleDate(input.end)}`,
   });
 

@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { ParticipantsList, type ParticipantRow } from '@/components/console/ParticipantsList';
 import { getConsoleProposal } from '@/lib/console/data';
-import { PROPOSAL_STATUS_LABEL, PROPOSAL_TYPE_META } from '@/lib/domain/proposal';
+import { anyTypeMeta, PROPOSAL_STATUS_LABEL, type AnyProposalType } from '@/lib/domain/proposal';
 import { formatDateTime, formatSlotRange, isPast } from '@/lib/format';
 
 export const metadata = { title: 'Détail d’une invitation' };
@@ -15,6 +16,8 @@ type Detail = {
     recipient_name: string;
     type: string;
     status: string;
+    audience: 'individual' | 'group';
+    group_capacity: number | null;
     message: string | null;
     photo_url: string | null;
     theme: string;
@@ -25,16 +28,19 @@ type Detail = {
   creator_email: string | null;
   locations: { id: string; label: string; address: string | null; position: number }[];
   slots: { id: string; start_time: string; end_time: string; position: number }[];
-  response: {
+  responses: {
+    id: string;
     chosen_location_id: string | null;
     chosen_slot_id: string | null;
     recipient_note: string | null;
     recipient_email: string | null;
+    participant_name: string | null;
+    status: string;
     proposed_start: string | null;
     proposed_end: string | null;
     proposed_location: string | null;
     responded_at: string;
-  } | null;
+  }[];
 };
 
 function Ligne({ label, children }: { label: string; children: React.ReactNode }) {
@@ -56,9 +62,11 @@ export default async function ConsoleProposalDetailPage({
 
   if (!data?.proposal) notFound();
 
-  const { proposal, creator_email, locations, slots, response } = data;
-  const meta = PROPOSAL_TYPE_META[proposal.type as keyof typeof PROPOSAL_TYPE_META];
+  const { proposal, creator_email, locations, slots, responses } = data;
+  const meta = anyTypeMeta(proposal.type as AnyProposalType);
   const expiree = isPast(proposal.expires_at);
+  const isGroup = proposal.audience === 'group';
+  const response = responses[0] ?? null;
 
   return (
     <div>
@@ -82,6 +90,9 @@ export default async function ConsoleProposalDetailPage({
           <dl className="mt-3">
             <Ligne label="Créateur">{creator_email ?? '—'}</Ligne>
             <Ligne label="Occasion">{meta?.label ?? proposal.type}</Ligne>
+            <Ligne label="Audience">
+              {isGroup ? `Groupe · capacité ${proposal.group_capacity}` : 'Individuelle'}
+            </Ligne>
             <Ligne label="Statut">
               {PROPOSAL_STATUS_LABEL[proposal.status as keyof typeof PROPOSAL_STATUS_LABEL] ??
                 proposal.status}
@@ -113,9 +124,30 @@ export default async function ConsoleProposalDetailPage({
         </section>
 
         <section className="rounded-[var(--radius-card)] border border-cream-300 bg-cream-50 p-5">
-          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-400">Réponse</h2>
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-400">
+            {isGroup ? `Participants (${responses.length})` : 'Réponse'}
+          </h2>
 
-          {response ? (
+          {isGroup ? (
+            <ParticipantsList
+              proposalId={proposal.id}
+              participants={responses.map(
+                (r): ParticipantRow => ({
+                  id: r.id,
+                  participantName: r.participant_name,
+                  status: r.status,
+                  respondedAt: r.responded_at,
+                  recipientEmail: r.recipient_email,
+                  chosenSlot: (() => {
+                    const slot = slots.find((s) => s.id === r.chosen_slot_id);
+                    return slot ? { start: slot.start_time, end: slot.end_time } : null;
+                  })(),
+                  chosenLocationLabel:
+                    locations.find((l) => l.id === r.chosen_location_id)?.label ?? null,
+                }),
+              )}
+            />
+          ) : response ? (
             <dl className="mt-3">
               <Ligne label="Répondu le">{formatDateTime(response.responded_at)}</Ligne>
               <Ligne label="Lieu retenu">
@@ -139,7 +171,7 @@ export default async function ConsoleProposalDetailPage({
             <p className="mt-3 text-sm text-ink-400">Pas encore de réponse.</p>
           )}
 
-          {response?.recipient_note ? (
+          {!isGroup && response?.recipient_note ? (
             <div className="mt-4 rounded-xl bg-cream-200 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-400">
                 Mot du destinataire

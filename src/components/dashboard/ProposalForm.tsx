@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
@@ -7,15 +8,23 @@ import { CopyLinkButton } from '@/components/dashboard/CopyLinkButton';
 import { LocationPicker, type LocationDraft } from '@/components/dashboard/LocationPicker';
 import { PhotoUpload } from '@/components/dashboard/PhotoUpload';
 import { Field, inputClass } from '@/components/ui/Field';
+import { SuggestionScroller } from '@/components/ui/SuggestionScroller';
 import {
+  anyTypeMeta,
   EXPIRY_OPTIONS,
+  GROUP_TYPES,
+  MAX_GROUP_CAPACITY,
   MAX_LOCATIONS,
   MAX_SLOTS,
+  MIN_GROUP_CAPACITY,
   PROPOSAL_TYPES,
-  PROPOSAL_TYPE_META,
+  type AnyProposalType,
+  type ProposalAudience,
   type ProposalType,
 } from '@/lib/domain/proposal';
 import { suggestionsFor } from '@/lib/domain/countries';
+import { messageSuggestionsFor } from '@/lib/domain/messages';
+import { canCreateGroupInvitations, type PlanId } from '@/lib/domain/pricing';
 import { THEMES, THEME_META, type Theme } from '@/lib/domain/themes';
 import { publicEnv } from '@/lib/env';
 
@@ -35,15 +44,20 @@ function emptySlot(): SlotDraft {
 export function ProposalForm({
   userId,
   country = null,
+  plan,
 }: {
   userId: string;
   /** Pays détecté côté serveur, pour adapter les suggestions de lieux. */
   country?: string | null;
+  plan: PlanId;
 }) {
   const router = useRouter();
+  const canGroup = canCreateGroupInvitations(plan);
 
+  const [audience, setAudience] = useState<ProposalAudience>('individual');
   const [recipientName, setRecipientName] = useState('');
-  const [type, setType] = useState<ProposalType>('restaurant');
+  const [type, setType] = useState<AnyProposalType>('restaurant');
+  const [groupCapacity, setGroupCapacity] = useState(8);
   const [message, setMessage] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [theme, setTheme] = useState<Theme>('classic');
@@ -61,8 +75,17 @@ export function ProposalForm({
   const [error, setError] = useState<string | null>(null);
   const [createdUrl, setCreatedUrl] = useState<string | null>(null);
 
-  const locationsOptional = type === 'surprise';
-  const suggestions = suggestionsFor(country, type);
+  function switchAudience(next: ProposalAudience) {
+    if (next === 'group' && !canGroup) return;
+    setAudience(next);
+    setType(next === 'group' ? 'friends' : 'restaurant');
+  }
+
+  const locationsOptional = audience === 'individual' && type === 'surprise';
+  // `type` n'est un `ProposalType` que lorsque `audience === 'individual'` —
+  // c'est `switchAudience` qui garantit cet invariant à chaque bascule.
+  const suggestions =
+    audience === 'individual' ? suggestionsFor(country, type as ProposalType) : [];
 
   function updateLocation(index: number, patch: Partial<LocationDraft>) {
     setLocations((current) =>
@@ -115,8 +138,10 @@ export function ProposalForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          audience,
           recipientName: recipientName.trim(),
           type,
+          groupCapacity: audience === 'group' ? groupCapacity : undefined,
           message: message.trim(),
           photoUrl,
           theme,
@@ -145,8 +170,9 @@ export function ProposalForm({
       <div className="bloc p-6 text-center">
         <p className="font-serif text-2xl font-extrabold text-bordeaux-600">Votre lien est prêt</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-400">
-          Envoyez-le à {recipientName || 'la personne concernée'}. Vous serez notifié par email dès
-          la réponse.
+          {audience === 'group'
+            ? `Partagez-le au groupe : ${groupCapacity} places, vous serez notifié par email à chaque réponse.`
+            : `Envoyez-le à ${recipientName || 'la personne concernée'}. Vous serez notifié par email dès la réponse.`}
         </p>
 
         <p className="mt-5 truncate rounded-xl border border-cream-300 bg-cream-100 px-4 py-3 text-sm text-ink-600">
@@ -177,22 +203,66 @@ export function ProposalForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <Field label="Son prénom" htmlFor="recipientName" required>
+      <Field label="Qui peut venir" required>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => switchAudience('individual')}
+            className={`rounded-xl border px-3 py-3 text-left text-sm transition ${
+              audience === 'individual'
+                ? 'border-accent bg-bordeaux-50 text-bordeaux-700'
+                : 'border-cream-300 bg-cream-50 text-ink-600 hover:border-ink-400'
+            }`}
+          >
+            <span className="font-medium">Une personne</span>
+            <span className="mt-0.5 block text-xs text-ink-400">Le parcours classique</span>
+          </button>
+
+          {canGroup ? (
+            <button
+              type="button"
+              onClick={() => switchAudience('group')}
+              className={`rounded-xl border px-3 py-3 text-left text-sm transition ${
+                audience === 'group'
+                  ? 'border-accent bg-bordeaux-50 text-bordeaux-700'
+                  : 'border-cream-300 bg-cream-50 text-ink-600 hover:border-ink-400'
+              }`}
+            >
+              <span className="font-medium">Un groupe</span>
+              <span className="mt-0.5 block text-xs text-ink-400">Capacité à définir</span>
+            </button>
+          ) : (
+            <Link
+              href="/tarifs"
+              className="rounded-xl border border-dashed border-cream-300 px-3 py-3 text-left text-sm text-ink-400 transition hover:border-bordeaux-500 hover:text-bordeaux-600"
+            >
+              <span className="font-medium">🔒 Un groupe</span>
+              <span className="mt-0.5 block text-xs">Réservé à Premium Gold</span>
+            </Link>
+          )}
+        </div>
+      </Field>
+
+      <Field
+        label={audience === 'group' ? "Nom du groupe ou de l'occasion" : 'Son prénom'}
+        htmlFor="recipientName"
+        required
+      >
         <input
           id="recipientName"
           value={recipientName}
           onChange={(event) => setRecipientName(event.target.value)}
           required
           maxLength={60}
-          placeholder="Camille"
+          placeholder={audience === 'group' ? 'Afterwork équipe design' : 'Camille'}
           className={inputClass}
         />
       </Field>
 
       <Field label="L'occasion" required>
         <div className="grid grid-cols-2 gap-2">
-          {PROPOSAL_TYPES.map((option) => {
-            const meta = PROPOSAL_TYPE_META[option];
+          {(audience === 'group' ? GROUP_TYPES : PROPOSAL_TYPES).map((option) => {
+            const meta = anyTypeMeta(option);
             const selected = option === type;
             return (
               <button
@@ -213,6 +283,24 @@ export function ProposalForm({
         </div>
       </Field>
 
+      {audience === 'group' ? (
+        <Field
+          label="Nombre de places"
+          htmlFor="groupCapacity"
+          hint={`De ${MIN_GROUP_CAPACITY} à ${MAX_GROUP_CAPACITY}. Au-delà, les personnes rejoignent une liste d'attente et sont prévenues automatiquement si une place se libère.`}
+        >
+          <input
+            id="groupCapacity"
+            type="number"
+            min={MIN_GROUP_CAPACITY}
+            max={MAX_GROUP_CAPACITY}
+            value={groupCapacity}
+            onChange={(event) => setGroupCapacity(Number(event.target.value))}
+            className={inputClass}
+          />
+        </Field>
+      ) : null}
+
       <Field
         label="Votre message"
         htmlFor="message"
@@ -227,6 +315,17 @@ export function ProposalForm({
           placeholder="J'ai pensé qu'on pourrait…"
           className={`${inputClass} resize-none`}
         />
+
+        {!message ? (
+          <div className="mt-2">
+            <SuggestionScroller
+              items={messageSuggestionsFor(type)}
+              onPick={setMessage}
+              icon="💬"
+              ariaLabel="Messages suggérés"
+            />
+          </div>
+        ) : null}
       </Field>
 
       <Field label="Une photo">

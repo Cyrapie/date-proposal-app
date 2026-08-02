@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "Une invitation pour toi",
-    template: "%s · Une invitation pour toi",
+    default: "Keerelle — la clé qui ouvre un moment",
+    template: "%s · Keerelle",
   },
   description:
     "Créez une invitation personnalisée et envoyez-la en un lien. La personne choisit le lieu et le créneau, le rendez-vous part dans vos agendas.",

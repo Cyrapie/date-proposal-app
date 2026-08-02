@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { getQuotaState, getUserPlan, isUserSuspended } from '@/lib/data/quota';
+import { canCreateGroupInvitations } from '@/lib/domain/pricing';
 import { generateSlug, proposalUrl } from '@/lib/domain/slug';
 import { publicEnv } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
@@ -53,9 +54,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const plan = await getUserPlan(user.id);
+
+  // Invitations de groupe : réservées à Premium Gold. Contrôlé ici, pas
+  // seulement masqué dans le formulaire — un appel direct à cette route ne
+  // doit pas suffire à contourner la formule.
+  if (parsed.data.audience === 'group' && !canCreateGroupInvitations(plan)) {
+    return NextResponse.json(
+      { error: 'Les invitations de groupe sont réservées à la formule Premium Gold.' },
+      { status: 403 },
+    );
+  }
+
   // Plafond mensuel. Contrôlé ici, côté serveur : l'affichage dans l'interface
   // est une commodité, il ne protège rien.
-  const quota = await getQuotaState(user.id, await getUserPlan(user.id));
+  const quota = await getQuotaState(user.id, plan);
 
   if (quota.reached) {
     return NextResponse.json(
@@ -82,6 +95,8 @@ export async function POST(request: NextRequest) {
         creator_id: user.id,
         recipient_name: input.recipientName,
         type: input.type,
+        audience: input.audience,
+        group_capacity: input.audience === 'group' ? (input.groupCapacity ?? null) : null,
         message: input.message ? input.message : null,
         photo_url: input.photoUrl ? input.photoUrl : null,
         theme: input.theme,

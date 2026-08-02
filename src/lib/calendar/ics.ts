@@ -2,10 +2,10 @@ import 'server-only';
 
 import { createEvent, type DateArray, type EventAttributes } from 'ics';
 
-import { PROPOSAL_TYPE_META, type ProposalType } from '@/lib/domain/proposal';
+import { anyTypeMeta, type AnyProposalType } from '@/lib/domain/proposal';
 
 export type CalendarEventInput = {
-  type: ProposalType;
+  type: AnyProposalType;
   recipientName: string;
   start: Date;
   end: Date;
@@ -47,7 +47,7 @@ function buildDescription(input: CalendarEventInput): string {
 }
 
 export function buildEventTitle(input: CalendarEventInput): string {
-  return `${PROPOSAL_TYPE_META[input.type].calendarSummary} avec ${input.recipientName}`;
+  return `${anyTypeMeta(input.type).calendarSummary} avec ${input.recipientName}`;
 }
 
 /** Génère le contenu d'un fichier .ics. Lève si la génération échoue. */

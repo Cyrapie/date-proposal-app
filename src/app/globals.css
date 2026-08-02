@@ -238,6 +238,80 @@ body {
   display: none;
 }
 
+/* --------------------------------------------------------------------------
+   Bandeau de suggestions défilant (lieux, messages). Boucle en douceur car le
+   contenu est dupliqué par le composant ; la coupure de bord est masquée par
+   un dégradé plutôt que rognée net. La règle globale de réduction de
+   mouvement ci-dessus fige déjà l'animation pour qui la demande.
+   -------------------------------------------------------------------------- */
+.suggestion-scroller {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent
+  );
+}
+
+.suggestion-scroller-track {
+  display: flex;
+  width: max-content;
+  gap: 0.5rem;
+  animation-name: suggestion-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.suggestion-scroller:hover .suggestion-scroller-track,
+.suggestion-scroller:focus-within .suggestion-scroller-track {
+  animation-play-state: paused;
+}
+
+@keyframes suggestion-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* La piste contient deux copies de la liste : la moitié du trajet ramène
+       exactement à l'état de départ, sans à-coup visible. */
+    transform: translateX(-50%);
+  }
+}
+
+.suggestion-pill {
+  flex: none;
+  white-space: nowrap;
+  border-radius: 9999px;
+  border: 1px solid var(--c-cream-300);
+  background: var(--c-cream-50);
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8125rem;
+  color: var(--c-ink-600);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.suggestion-pill:hover,
+.suggestion-pill:focus-visible {
+  border-color: var(--c-bordeaux-500);
+  background: var(--c-bordeaux-50);
+  color: var(--c-bordeaux-600);
+  transform: translateY(-1px);
+}
+
 /* ==========================================================================
    Corps des articles de blog (HTML issu du Markdown).
    ========================================================================== */

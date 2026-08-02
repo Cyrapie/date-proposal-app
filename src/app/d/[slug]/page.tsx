@@ -6,7 +6,7 @@ import { ExpiredLink } from '@/components/recipient/ExpiredLink';
 import { googleCalendarUrl } from '@/lib/calendar/google';
 import { mapsUrl } from '@/lib/domain/geo';
 import { getProposalBySlug, isExpired } from '@/lib/data/proposals';
-import { HIDDEN_LOCATION_TYPES } from '@/lib/domain/proposal';
+import { HIDDEN_LOCATION_TYPES, type ProposalType } from '@/lib/domain/proposal';
 import { proposalUrl } from '@/lib/domain/slug';
 import { publicEnv } from '@/lib/env';
 
@@ -14,7 +14,7 @@ import { publicEnv } from '@/lib/env';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Une invitation pour toi',
+  title: 'Keerelle',
   robots: { index: false, follow: false },
 };
 
@@ -31,16 +31,20 @@ export default async function ProposalPage({
   }
 
   // Un lien expiré n'est plus consultable : le contenu n'est jamais rendu.
-  if (isExpired(proposal) && !proposal.response) {
+  // Exception : au moins une réponse existe déjà, pour que qui a déjà
+  // répondu garde accès à son récapitulatif.
+  if (isExpired(proposal) && proposal.responses.length === 0) {
     return <ExpiredLink theme={proposal.theme} />;
   }
 
-  const hideLocations = HIDDEN_LOCATION_TYPES.includes(proposal.type);
+  const isGroup = proposal.audience === 'group';
+  const hideLocations = !isGroup && HIDDEN_LOCATION_TYPES.includes(proposal.type as ProposalType);
 
   const publicProposal: PublicProposal = {
     slug: proposal.slug,
     recipientName: proposal.recipient_name,
     type: proposal.type,
+    audience: proposal.audience,
     message: proposal.message,
     photoUrl: proposal.photo_url,
     theme: proposal.theme,
@@ -58,16 +62,26 @@ export default async function ProposalPage({
       end: slot.end_time,
     })),
     hideLocations,
+    group: isGroup
+      ? {
+          capacity: proposal.group_capacity ?? 0,
+          confirmedCount: proposal.responses.filter((r) => r.status === 'confirmed').length,
+          waitlistedCount: proposal.responses.filter((r) => r.status === 'waitlisted').length,
+        }
+      : undefined,
   };
 
-  // Si la réponse existe déjà, on affiche directement le récapitulatif :
-  // le lien reste consultable par le destinataire après coup.
+  // Si la réponse existe déjà, on affiche directement le récapitulatif : le
+  // lien reste consultable par le destinataire après coup. Impossible à
+  // déterminer pour un groupe — plusieurs personnes différentes partagent le
+  // même lien, la page ne sait pas laquelle l'ouvre.
   let initialResponse: ConfirmedResponse | null = null;
+  const existingResponse = proposal.responses[0];
 
-  if (proposal.response) {
-    const slot = proposal.slots.find((item) => item.id === proposal.response?.chosen_slot_id);
+  if (!isGroup && existingResponse) {
+    const slot = proposal.slots.find((item) => item.id === existingResponse.chosen_slot_id);
     const location = proposal.locations.find(
-      (item) => item.id === proposal.response?.chosen_location_id,
+      (item) => item.id === existingResponse.chosen_location_id,
     );
 
     if (slot) {
@@ -77,8 +91,8 @@ export default async function ProposalPage({
         location: location
           ? { label: location.label, address: location.address, mapUrl: mapsUrl(location) }
           : null,
-        note: proposal.response.recipient_note,
-        icsUrl: `/api/d/${proposal.slug}/ics`,
+        note: existingResponse.recipient_note,
+        icsUrl: `/api/d/${proposal.slug}/ics?r=${existingResponse.id}`,
         googleCalendarUrl: googleCalendarUrl({
           type: proposal.type,
           recipientName: proposal.recipient_name,
@@ -86,7 +100,7 @@ export default async function ProposalPage({
           end: new Date(slot.end_time),
           locationLabel: location?.label ?? null,
           locationAddress: location?.address ?? null,
-          note: proposal.response.recipient_note,
+          note: existingResponse.recipient_note,
           url: proposalUrl(publicEnv.siteUrl, proposal.slug),
         }),
       };

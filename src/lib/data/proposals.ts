@@ -25,7 +25,7 @@ export async function getProposalBySlug(slug: string): Promise<FullProposal | nu
   if (error) throw error;
   if (!proposal) return null;
 
-  const [locations, slots, response] = await Promise.all([
+  const [locations, slots, responses] = await Promise.all([
     supabase
       .from('proposal_locations')
       .select('*')
@@ -36,18 +36,24 @@ export async function getProposalBySlug(slug: string): Promise<FullProposal | nu
       .select('*')
       .eq('proposal_id', proposal.id)
       .order('position', { ascending: true }),
-    supabase.from('responses').select('*').eq('proposal_id', proposal.id).maybeSingle(),
+    // Un tableau, jamais `.maybeSingle()` : une invitation de groupe porte
+    // potentiellement plusieurs réponses.
+    supabase
+      .from('responses')
+      .select('*')
+      .eq('proposal_id', proposal.id)
+      .order('responded_at', { ascending: true }),
   ]);
 
   if (locations.error) throw locations.error;
   if (slots.error) throw slots.error;
-  if (response.error) throw response.error;
+  if (responses.error) throw responses.error;
 
   return {
     ...(proposal as ProposalRow),
     locations: (locations.data ?? []) as ProposalLocationRow[],
     slots: (slots.data ?? []) as ProposalSlotRow[],
-    response: (response.data ?? null) as ResponseRow | null,
+    responses: (responses.data ?? []) as ResponseRow[],
   };
 }
 

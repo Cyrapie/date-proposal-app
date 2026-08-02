@@ -5,7 +5,12 @@
  *   npx supabase gen types typescript --project-id <ref> > src/lib/supabase/database.types.ts
  */
 
-import type { ProposalStatus, ProposalType } from '@/lib/domain/proposal';
+import type {
+  AnyProposalType,
+  ProposalAudience,
+  ProposalStatus,
+  ResponseStatus,
+} from '@/lib/domain/proposal';
 import type { Theme } from '@/lib/domain/themes';
 
 export type UserRow = {
@@ -34,12 +39,15 @@ export type ProposalRow = {
   id: string;
   creator_id: string;
   recipient_name: string;
-  type: ProposalType;
+  type: AnyProposalType;
   message: string | null;
   photo_url: string | null;
   theme: Theme;
   slug: string;
   status: ProposalStatus;
+  audience: ProposalAudience;
+  /** Places confirmées pour une invitation de groupe. Nul en individuel. */
+  group_capacity: number | null;
   viewed_at: string | null;
   expires_at: string;
   created_at: string;
@@ -76,6 +84,12 @@ export type ResponseRow = {
   proposed_start: string | null;
   proposed_end: string | null;
   proposed_location: string | null;
+  /** confirmed ou waitlisted. Toujours confirmed hors invitation de groupe. */
+  status: ResponseStatus;
+  /** Prénom du participant, demandé uniquement en groupe. */
+  participant_name: string | null;
+  /** Jeton d'auto-annulation, non nul uniquement en groupe. */
+  cancel_token: string | null;
   responded_at: string;
 };
 
@@ -161,15 +175,58 @@ export type Database = {
         };
         Returns: void;
       };
+      respond_to_proposal: {
+        Args: {
+          p_proposal_id: string;
+          p_chosen_location_id: string | null;
+          p_chosen_slot_id: string | null;
+          p_recipient_note: string | null;
+          p_recipient_email: string | null;
+          p_proposed_start: string | null;
+          p_proposed_end: string | null;
+          p_proposed_location: string | null;
+          p_participant_name: string | null;
+        };
+        Returns: {
+          response_id: string;
+          response_status: ResponseStatus;
+          response_cancel_token: string | null;
+          response_waitlist_position: number | null;
+        }[];
+      };
+      cancel_group_response: {
+        Args: { p_response_id: string; p_cancel_token: string };
+        Returns: {
+          cancelled: boolean;
+          promoted_id: string | null;
+          promoted_email: string | null;
+          promoted_participant_name: string | null;
+        }[];
+      };
+      console_remove_group_response: {
+        Args: { p_response_id: string };
+        Returns: {
+          proposal_id: string | null;
+          promoted_id: string | null;
+          promoted_email: string | null;
+          promoted_participant_name: string | null;
+        }[];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
 };
 
-/** Proposition complète telle que consommée par le parcours destinataire. */
+/**
+ * Proposition complète telle que consommée par le parcours destinataire.
+ *
+ * `responses` est un tableau — jamais un `response` singulier — car une
+ * invitation de groupe en porte potentiellement plusieurs. Pour une
+ * invitation individuelle, il en contient au plus une.
+ */
 export type FullProposal = ProposalRow & {
   locations: ProposalLocationRow[];
   slots: ProposalSlotRow[];
-  response: ResponseRow | null;
+  responses: ResponseRow[];
 };

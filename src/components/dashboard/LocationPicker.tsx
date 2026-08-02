@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { inputClass } from '@/components/ui/Field';
+import { SuggestionScroller } from '@/components/ui/SuggestionScroller';
 import { mapsUrl, roundCoord } from '@/lib/domain/geo';
 
 export type LocationDraft = {
@@ -93,17 +94,13 @@ export function LocationPicker({
       />
 
       {suggestions.length > 0 && !value.label ? (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {suggestions.map((idee) => (
-            <button
-              key={idee}
-              type="button"
-              onClick={() => onChange({ label: idee })}
-              className="rounded-full border border-cream-300 px-3 py-1.5 text-xs text-ink-600 transition hover:border-bordeaux-500 hover:bg-bordeaux-50 hover:text-bordeaux-600"
-            >
-              {idee}
-            </button>
-          ))}
+        <div className="mt-2">
+          <SuggestionScroller
+            items={suggestions}
+            onPick={(idee) => onChange({ label: idee })}
+            icon="📍"
+            ariaLabel="Idées de lieux"
+          />
         </div>
       ) : null}
 

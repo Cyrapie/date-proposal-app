@@ -1,4 +1,4 @@
-import type { ProposalType } from '@/lib/domain/proposal';
+import type { AnyProposalType, ProposalAudience } from '@/lib/domain/proposal';
 import type { Theme } from '@/lib/domain/themes';
 
 /**
@@ -8,7 +8,8 @@ import type { Theme } from '@/lib/domain/themes';
 export type PublicProposal = {
   slug: string;
   recipientName: string;
-  type: ProposalType;
+  type: AnyProposalType;
+  audience: ProposalAudience;
   message: string | null;
   photoUrl: string | null;
   theme: Theme;
@@ -22,6 +23,12 @@ export type PublicProposal = {
   slots: { id: string; start: string; end: string }[];
   /** Le lieu est masqué jusqu'à l'acceptation (occasion « surprise »). */
   hideLocations: boolean;
+  /** Présent uniquement pour une invitation de groupe. */
+  group?: {
+    capacity: number;
+    confirmedCount: number;
+    waitlistedCount: number;
+  };
 };
 
 export type ConfirmedResponse = {
@@ -32,4 +39,10 @@ export type ConfirmedResponse = {
   note: string | null;
   googleCalendarUrl: string;
   icsUrl: string;
+  /** Présent uniquement pour une invitation de groupe. */
+  group?: {
+    status: 'confirmed' | 'waitlisted';
+    capacity: number;
+    waitlistPosition?: number;
+  };
 };

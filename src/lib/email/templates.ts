@@ -1,9 +1,19 @@
-import { PROPOSAL_TYPE_META, type ProposalType } from '@/lib/domain/proposal';
+import { anyTypeMeta, type AnyProposalType } from '@/lib/domain/proposal';
 import { formatSlotRange } from '@/lib/format';
+
+export type GroupEmailContext = {
+  participantName: string;
+  status: 'confirmed' | 'waitlisted' | 'promoted';
+  capacity: number;
+  confirmedCount: number;
+  waitlistPosition?: number;
+  /** Absent pour l'email de promotion : la place est déjà acquise, plus rien à annuler avant. */
+  cancelUrl?: string;
+};
 
 export type ResponseEmailData = {
   recipientName: string;
-  type: ProposalType;
+  type: AnyProposalType;
   locationLabel: string | null;
   locationAddress: string | null;
   slotStart: string;
@@ -13,6 +23,8 @@ export type ResponseEmailData = {
   proposalUrl: string;
   /** Contre-proposition : le destinataire a proposé sa propre date. */
   countered?: boolean;
+  /** Présent uniquement pour une invitation de groupe. */
+  group?: GroupEmailContext;
 };
 
 function escapeHtml(value: string): string {
@@ -97,40 +109,70 @@ export function creatorResponseEmail(data: ResponseEmailData): {
   html: string;
   text: string;
 } {
-  const meta = PROPOSAL_TYPE_META[data.type];
-  const subject = data.countered
-    ? `${data.recipientName} propose une autre date ${meta.emoji}`
-    : `${data.recipientName} a dit oui ${meta.emoji}`;
+  const meta = anyTypeMeta(data.type);
+  const group = data.group;
+  const who = group ? group.participantName : data.recipientName;
+
+  const subject = group
+    ? group.status === 'waitlisted'
+      ? `${who} rejoint la liste d'attente ${meta.emoji}`
+      : `${who} a une place ${meta.emoji} (${group.confirmedCount}/${group.capacity})`
+    : data.countered
+      ? `${data.recipientName} propose une autre date ${meta.emoji}`
+      : `${data.recipientName} a dit oui ${meta.emoji}`;
+
+  const intro = group
+    ? group.status === 'waitlisted'
+      ? `${escapeHtml(who)} a rejoint la liste d'attente : toutes les places sont prises pour l'instant.`
+      : `${escapeHtml(who)} a rejoint votre invitation. ${group.confirmedCount} place${group.confirmedCount > 1 ? 's' : ''} confirmée${group.confirmedCount > 1 ? 's' : ''} sur ${group.capacity}.`
+    : data.countered
+      ? "Aucun de vos créneaux ne convenait, voici sa proposition."
+      : 'Voici ce qui a été choisi.';
 
   const html = layout(
     subject,
-    `<p style="margin:0 0 6px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:${COLORS.muted};">${data.countered ? 'Autre date proposée' : "C'est un oui"}</p>
-     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.25;font-weight:600;color:${COLORS.accent};">${escapeHtml(data.recipientName)} ${data.countered ? "propose une autre date" : "a accepté votre invitation"}</h1>
-     <p style="margin:0;font-size:15px;line-height:1.6;">${escapeHtml(meta.headline)}. ${data.countered ? "Aucun de vos créneaux ne convenait, voici sa proposition." : "Voici ce qui a été choisi."}</p>
+    `<p style="margin:0 0 6px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:${COLORS.muted};">${group ? (group.status === 'waitlisted' ? "Liste d'attente" : 'Nouvelle place confirmée') : data.countered ? 'Autre date proposée' : "C'est un oui"}</p>
+     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.25;font-weight:600;color:${COLORS.accent};">${escapeHtml(who)} ${group ? (group.status === 'waitlisted' ? 'est en liste d’attente' : 'a rejoint votre invitation') : data.countered ? 'propose une autre date' : 'a accepté votre invitation'}</h1>
+     <p style="margin:0;font-size:15px;line-height:1.6;">${escapeHtml(meta.headline)}. ${intro}</p>
      ${detailsTable(data)}
      ${noteBlock(data.note)}
-     <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${COLORS.muted};">
+     ${
+       group && group.status === 'waitlisted'
+         ? ''
+         : `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${COLORS.muted};">
        Le fichier <strong>.ics</strong> est joint à cet email : ouvrez-le pour ajouter le rendez-vous à votre agenda.
      </p>
-     ${calendarButton(data.googleCalendarUrl)}`,
+     ${calendarButton(data.googleCalendarUrl)}`
+     }`,
   );
 
   const text = [
-    data.countered
-      ? `${data.recipientName} propose une autre date.`
-      : `${data.recipientName} a accepté votre invitation.`,
+    group
+      ? group.status === 'waitlisted'
+        ? `${who} a rejoint la liste d'attente.`
+        : `${who} a rejoint votre invitation (${group.confirmedCount}/${group.capacity}).`
+      : data.countered
+        ? `${data.recipientName} propose une autre date.`
+        : `${data.recipientName} a accepté votre invitation.`,
     '',
     `Quand : ${formatSlotRange(data.slotStart, data.slotEnd)}`,
     data.locationLabel ? `Où : ${data.locationLabel}` : null,
     data.locationAddress ? `Adresse : ${data.locationAddress}` : null,
     data.note ? `\nUn mot : « ${data.note} »` : null,
-    '',
-    `Ajouter à Google Calendar : ${data.googleCalendarUrl}`,
+    !group || group.status !== 'waitlisted' ? '' : null,
+    !group || group.status !== 'waitlisted' ? `Ajouter à Google Calendar : ${data.googleCalendarUrl}` : null,
   ]
     .filter((line) => line !== null)
     .join('\n');
 
   return { subject, html, text };
+}
+
+function cancelBlock(cancelUrl: string | undefined): string {
+  if (!cancelUrl) return '';
+  return `<p style="margin:20px 0 0;font-size:12px;line-height:1.6;color:${COLORS.muted};">
+      Un empêchement ? <a href="${cancelUrl}" style="color:${COLORS.muted};">Annulez votre place</a> pour la libérer.
+    </p>`;
 }
 
 /** Email de confirmation au destinataire (si l'email a été laissé). */
@@ -139,31 +181,58 @@ export function recipientConfirmationEmail(data: ResponseEmailData): {
   html: string;
   text: string;
 } {
-  const meta = PROPOSAL_TYPE_META[data.type];
-  const subject = data.countered
-    ? `Votre proposition est transmise ${meta.emoji}`
-    : `C'est noté ${meta.emoji}, votre rendez-vous est confirmé`;
+  const meta = anyTypeMeta(data.type);
+  const group = data.group;
+  const name = group ? group.participantName : data.recipientName;
+
+  const subject = group
+    ? group.status === 'waitlisted'
+      ? `Vous êtes en liste d'attente ${meta.emoji}`
+      : group.status === 'promoted'
+        ? `Une place s'est libérée ${meta.emoji}, vous êtes confirmé`
+        : `C'est noté ${meta.emoji}, votre place est confirmée`
+    : data.countered
+      ? `Votre proposition est transmise ${meta.emoji}`
+      : `C'est noté ${meta.emoji}, votre rendez-vous est confirmé`;
+
+  const intro = group
+    ? group.status === 'waitlisted'
+      ? `Toutes les places sont prises pour l'instant — vous êtes en position ${group.waitlistPosition ?? '?'} sur la liste d'attente. Vous serez prévenu si une place se libère.`
+      : group.status === 'promoted'
+        ? "Une place vient de se libérer et elle est à vous. Voici les détails."
+        : `Votre place est confirmée. ${group.confirmedCount}/${group.capacity} places prises.`
+    : data.countered
+      ? 'Votre proposition a été transmise, en attente de confirmation.'
+      : 'Récapitulatif de votre choix.';
+
+  const showCalendar = !group || group.status !== 'waitlisted';
 
   const html = layout(
     subject,
-    `<p style="margin:0 0 6px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:${COLORS.muted};">Confirmation</p>
-     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.25;font-weight:600;color:${COLORS.accent};">C'est noté, ${escapeHtml(data.recipientName)}</h1>
-     <p style="margin:0;font-size:15px;line-height:1.6;">${escapeHtml(meta.headline)}. ${data.countered ? "Votre proposition a été transmise, en attente de confirmation." : "Récapitulatif de votre choix."}</p>
+    `<p style="margin:0 0 6px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:${COLORS.muted};">${group?.status === 'waitlisted' ? "Liste d'attente" : 'Confirmation'}</p>
+     <h1 style="margin:0 0 16px;font-size:26px;line-height:1.25;font-weight:600;color:${COLORS.accent};">${group?.status === 'waitlisted' ? `Patience, ${escapeHtml(name)}` : `C'est noté, ${escapeHtml(name)}`}</h1>
+     <p style="margin:0;font-size:15px;line-height:1.6;">${escapeHtml(meta.headline)}. ${intro}</p>
      ${detailsTable(data)}
-     <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${COLORS.muted};">
+     ${
+       showCalendar
+         ? `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${COLORS.muted};">
        Le fichier <strong>.ics</strong> joint ajoute le rendez-vous à votre agenda en un clic.
      </p>
-     ${calendarButton(data.googleCalendarUrl)}`,
+     ${calendarButton(data.googleCalendarUrl)}`
+         : ''
+     }
+     ${cancelBlock(group?.cancelUrl)}`,
   );
 
   const text = [
-    `C'est noté, ${data.recipientName}.`,
+    group?.status === 'waitlisted' ? `Patience, ${name}.` : `C'est noté, ${name}.`,
     '',
     `Quand : ${formatSlotRange(data.slotStart, data.slotEnd)}`,
     data.locationLabel ? `Où : ${data.locationLabel}` : null,
     data.locationAddress ? `Adresse : ${data.locationAddress}` : null,
     '',
-    `Ajouter à Google Calendar : ${data.googleCalendarUrl}`,
+    showCalendar ? `Ajouter à Google Calendar : ${data.googleCalendarUrl}` : null,
+    group?.cancelUrl ? `Annuler votre place : ${group.cancelUrl}` : null,
   ]
     .filter((line) => line !== null)
     .join('\n');

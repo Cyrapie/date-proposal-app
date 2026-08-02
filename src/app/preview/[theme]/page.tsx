@@ -37,6 +37,7 @@ export default async function PreviewPage({
     slug: '__preview__',
     recipientName: 'Camille',
     type: 'restaurant',
+    audience: 'individual',
     message:
       "Ça fait trop longtemps qu'on n'a pas pris une vraie soirée pour nous deux. J'ai repéré deux endroits, à toi de choisir.",
     photoUrl: null,

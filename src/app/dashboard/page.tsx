@@ -6,7 +6,7 @@ import { QuotaBadge } from '@/components/dashboard/QuotaBadge';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { Heart } from '@/components/ui/Heart';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { PROPOSAL_TYPE_META } from '@/lib/domain/proposal';
+import { anyTypeMeta } from '@/lib/domain/proposal';
 import { proposalUrl } from '@/lib/domain/slug';
 import { getQuotaState, getUserPlan } from '@/lib/data/quota';
 import { formatShortDate, isPast } from '@/lib/format';
@@ -43,6 +43,27 @@ export default async function DashboardPage() {
 
   const proposals = (data ?? []) as ProposalRow[];
   const quota = await getQuotaState(user.id, await getUserPlan(user.id));
+
+  // Un seul aller-retour pour toutes les invitations de groupe plutôt qu'une
+  // requête par carte — RLS filtre déjà sur les propositions du créateur.
+  const groupProposalIds = proposals.filter((p) => p.audience === 'group').map((p) => p.id);
+  const participantsByProposal = new Map<
+    string,
+    { participantName: string | null; status: string }[]
+  >();
+
+  if (groupProposalIds.length > 0) {
+    const { data: groupResponses } = await supabase
+      .from('responses')
+      .select('proposal_id, participant_name, status')
+      .in('proposal_id', groupProposalIds);
+
+    for (const row of groupResponses ?? []) {
+      const list = participantsByProposal.get(row.proposal_id) ?? [];
+      list.push({ participantName: row.participant_name, status: row.status });
+      participantsByProposal.set(row.proposal_id, list);
+    }
+  }
 
   // Lu via la session normale (RLS : l'utilisateur ne voit que sa propre
   // ligne) — sert seulement à afficher le lien, pas à protéger /admin.
@@ -117,9 +138,13 @@ export default async function DashboardPage() {
       ) : (
         <ul className="mt-8 space-y-3">
           {proposals.map((proposal) => {
-            const meta = PROPOSAL_TYPE_META[proposal.type];
+            const meta = anyTypeMeta(proposal.type);
             const url = proposalUrl(publicEnv.siteUrl, proposal.slug);
             const expired = isPast(proposal.expires_at);
+            const isGroup = proposal.audience === 'group';
+            const participants = participantsByProposal.get(proposal.id) ?? [];
+            const confirmed = participants.filter((p) => p.status === 'confirmed');
+            const waitlisted = participants.filter((p) => p.status === 'waitlisted');
 
             return (
               <li
@@ -137,6 +162,27 @@ export default async function DashboardPage() {
                   </div>
                   <StatusBadge status={proposal.status} />
                 </div>
+
+                {isGroup ? (
+                  <div className="mt-3 rounded-xl bg-cream-200 p-3">
+                    <p className="text-xs font-semibold text-ink-600">
+                      {confirmed.length} / {proposal.group_capacity} places confirmées
+                      {waitlisted.length > 0
+                        ? ` · ${waitlisted.length} en liste d'attente`
+                        : ''}
+                    </p>
+                    {participants.length > 0 ? (
+                      <ul className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-400">
+                        {participants.map((p, i) => (
+                          <li key={i}>
+                            {p.participantName ?? 'Anonyme'}
+                            {p.status === 'waitlisted' ? ' (attente)' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                ) : null}
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <CopyLinkButton url={url} />

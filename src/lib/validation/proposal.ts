@@ -2,8 +2,12 @@ import { z } from 'zod';
 
 import {
   EXPIRY_OPTIONS,
+  GROUP_TYPES,
+  MAX_GROUP_CAPACITY,
   MAX_LOCATIONS,
   MAX_SLOTS,
+  MIN_GROUP_CAPACITY,
+  PROPOSAL_AUDIENCES,
   PROPOSAL_TYPES,
 } from '@/lib/domain/proposal';
 import { THEMES } from '@/lib/domain/themes';
@@ -14,8 +18,10 @@ const isoDateTime = z
 
 export const createProposalSchema = z
   .object({
+    audience: z.enum(PROPOSAL_AUDIENCES).default('individual'),
     recipientName: z.string().trim().min(1, 'Le prénom est requis.').max(60),
-    type: z.enum(PROPOSAL_TYPES),
+    type: z.enum([...PROPOSAL_TYPES, ...GROUP_TYPES]),
+    groupCapacity: z.number().int().min(MIN_GROUP_CAPACITY).max(MAX_GROUP_CAPACITY).optional(),
     message: z.string().trim().max(2000).optional().or(z.literal('')),
     photoUrl: z.string().url().max(2048).optional().or(z.literal('')),
     theme: z.enum(THEMES),
@@ -42,8 +48,28 @@ export const createProposalSchema = z
       .max(MAX_SLOTS, 'Cinq créneaux maximum.'),
   })
   .superRefine((value, ctx) => {
+    const isGroupType = (GROUP_TYPES as readonly string[]).includes(value.type);
+
+    if (value.audience === 'group' && !isGroupType) {
+      ctx.addIssue({ code: 'custom', path: ['type'], message: 'Occasion de groupe invalide.' });
+    }
+    if (value.audience === 'individual' && isGroupType) {
+      ctx.addIssue({ code: 'custom', path: ['type'], message: 'Occasion individuelle invalide.' });
+    }
+    if (value.audience === 'group' && value.groupCapacity === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['groupCapacity'],
+        message: 'Indiquez le nombre de places.',
+      });
+    }
+
     // Une occasion « surprise » masque le lieu : les lieux deviennent optionnels.
-    if (value.type !== 'surprise' && value.locations.length === 0) {
+    // Sans équivalent en groupe, où le lieu n'est jamais masqué.
+    if (
+      value.locations.length === 0 &&
+      !(value.audience === 'individual' && value.type === 'surprise')
+    ) {
       ctx.addIssue({
         code: 'custom',
         path: ['locations'],
@@ -75,6 +101,8 @@ export const respondSchema = z
     proposedStart: isoDateTime.nullable().optional(),
     proposedEnd: isoDateTime.nullable().optional(),
     proposedLocation: z.string().trim().max(300).optional().or(z.literal('')),
+    /** Demandé uniquement sur une invitation de groupe, pour distinguer les réponses. */
+    participantName: z.string().trim().max(60).optional().or(z.literal('')),
   })
   .superRefine((value, ctx) => {
     const contreProposition = Boolean(value.proposedStart || value.proposedEnd);

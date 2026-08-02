@@ -51,7 +51,7 @@ export function SiteHeader() {
           aria-label={t.nav.homeAria}
         >
           <Heart className="h-5 w-5 text-bordeaux-500" />
-          <span className="font-serif text-lg leading-none">Une invitation</span>
+          <span className="font-serif text-lg leading-none">Keerelle</span>
         </Link>
 
         <nav aria-label={t.nav.mainNavLabel} className="hidden lg:block">

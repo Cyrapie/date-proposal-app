@@ -22,7 +22,8 @@ export default async function NewProposalPage() {
     redirect('/login');
   }
 
-  const quota = await getQuotaState(user.id, await getUserPlan(user.id));
+  const plan = await getUserPlan(user.id);
+  const quota = await getQuotaState(user.id, plan);
 
   return (
     <div className="mx-auto w-full max-w-lg px-5 py-10 sm:py-14">
@@ -51,7 +52,7 @@ export default async function NewProposalPage() {
         </p>
       ) : (
         <div className="mt-6">
-          <ProposalForm userId={user.id} country={country} />
+          <ProposalForm userId={user.id} country={country} plan={plan} />
         </div>
       )}
     </div>

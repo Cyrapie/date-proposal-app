@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-import { PROPOSAL_TYPE_META } from '@/lib/domain/proposal';
+import { anyTypeMeta } from '@/lib/domain/proposal';
 import type { PublicProposal } from '@/components/recipient/types';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
@@ -27,7 +27,7 @@ export function LetterScreen({
   proposal: PublicProposal;
   onContinue: () => void;
 }) {
-  const meta = PROPOSAL_TYPE_META[proposal.type];
+  const meta = anyTypeMeta(proposal.type);
 
   return (
     <motion.div
