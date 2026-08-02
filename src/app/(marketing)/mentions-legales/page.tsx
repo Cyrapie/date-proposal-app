@@ -1,29 +1,35 @@
+import { LegalLayout, type LegalSection } from '@/components/marketing/LegalLayout';
 import { PageHeader } from '@/components/marketing/PageHeader';
 
 export const metadata = {
   title: 'Mentions légales',
 };
 
-const SECTIONS = [
+const SECTIONS: LegalSection[] = [
   {
+    id: 'editeur',
     title: 'Éditeur',
-    body: [
+    paragraphs: [
       "Le service « Une invitation » est édité par Otyche. Raison sociale, forme juridique, adresse du siège et numéro d'immatriculation à renseigner ici avant mise en production.",
     ],
   },
   {
+    id: 'directeur-publication',
     title: 'Directeur de publication',
-    body: ["Nom et contact du directeur de publication à renseigner ici avant mise en production."],
+    paragraphs: ["Nom et contact du directeur de publication à renseigner ici avant mise en production."],
   },
   {
+    id: 'hebergement',
     title: 'Hébergement',
-    body: [
+    paragraphs: [
       "L'application est hébergée par Vercel Inc. Base de données et authentification hébergées par Supabase.",
     ],
   },
   {
+    id: 'contact',
     title: 'Contact',
-    body: ["Adresse email de contact à renseigner ici avant mise en production."],
+    paragraphs: ["Pour toute question relative à ce site, une adresse de contact est à renseigner ici avant mise en production."],
+    note: 'En attendant, écrivez-nous depuis la page Contact du site : votre message nous parvient directement.',
   },
 ];
 
@@ -34,24 +40,7 @@ export default function MentionsLegalesPage() {
         <p>Qui édite ce service, qui l&apos;héberge, et comment nous contacter.</p>
       </PageHeader>
 
-      <main className="mx-auto w-full max-w-2xl px-6 py-16">
-        <div className="space-y-10">
-          {SECTIONS.map((section) => (
-            <section key={section.title}>
-              <h2 className="font-serif text-2xl font-extrabold text-bordeaux-600">
-                {section.title}
-              </h2>
-              <div className="mt-3 space-y-3">
-                {section.body.map((paragraph) => (
-                  <p key={paragraph} className="text-sm leading-relaxed text-ink-600">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </main>
+      <LegalLayout sections={SECTIONS} />
     </>
   );
 }
