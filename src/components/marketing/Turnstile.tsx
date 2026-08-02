@@ -3,6 +3,8 @@
 import Script from 'next/script';
 import { useEffect, useId, useRef, useState } from 'react';
 
+import { useLang } from '@/lib/i18n/language';
+
 declare global {
   interface Window {
     turnstile?: {
@@ -31,6 +33,7 @@ declare global {
  */
 export function Turnstile({ onToken }: { onToken: (token: string | null) => void }) {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const lang = useLang();
   const conteneur = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const [pret, setPret] = useState(false);
@@ -46,7 +49,7 @@ export function Turnstile({ onToken }: { onToken: (token: string | null) => void
       'expired-callback': () => onToken(null),
       'error-callback': () => onToken(null),
       theme: 'auto',
-      language: 'fr',
+      language: lang,
     });
 
     const id = widgetId.current;
@@ -54,7 +57,7 @@ export function Turnstile({ onToken }: { onToken: (token: string | null) => void
       if (id) window.turnstile?.remove(id);
       widgetId.current = null;
     };
-  }, [siteKey, pret, onToken]);
+  }, [siteKey, pret, onToken, lang]);
 
   if (!siteKey) return null;
 

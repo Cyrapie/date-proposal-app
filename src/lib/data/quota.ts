@@ -72,3 +72,27 @@ export async function getUserPlan(userId: string): Promise<PlanId> {
   const plan = data?.plan;
   return plan === 'premium' || plan === 'gold' ? plan : 'free';
 }
+
+/**
+ * Un compte suspendu depuis la console ne peut plus créer d'invitation.
+ *
+ * Contrairement au quota, l'échec de lecture bloque ici : entre laisser passer
+ * un compte peut-être suspendu et refuser un compte peut-être légitime, une
+ * suspension est une décision d'exploitation qu'on ne contourne pas sur une
+ * erreur réseau. Le créateur peut réessayer.
+ */
+export async function isUserSuspended(userId: string): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('suspended_at')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('[quota] Lecture du statut de suspension impossible', error);
+    return true;
+  }
+
+  return Boolean(data?.suspended_at);
+}

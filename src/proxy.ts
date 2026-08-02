@@ -2,11 +2,22 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Rafraîchit la session Supabase à chaque requête et protège /dashboard.
+ * Rafraîchit la session Supabase à chaque requête et protège /dashboard,
+ * /admin et /console.
+ *
+ * Deux sessions cohabitent sur le même domaine, sur deux préfixes de cookie
+ * distincts : celle du créateur (`sb-`, par défaut) et celle de la console
+ * (`otyche-console`). Une requête vers /console ne touche donc jamais la
+ * session créateur, et réciproquement.
  *
  * Next.js 16 a renommé `middleware.ts` en `proxy.ts` — ce fichier remplit le
  * rôle de l'ancien middleware.
  */
+
+// Dupliqué depuis `lib/supabase/console.ts` : ce module tourne dans le runtime
+// proxy, qui ne peut pas importer un fichier marqué `server-only`.
+const CONSOLE_COOKIE_NAME = 'otyche-console';
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -19,7 +30,12 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  const { pathname } = request.nextUrl;
+  const isConsole = pathname.startsWith('/console');
+
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    // Sur /console, on rafraîchit la session console et elle seule.
+    ...(isConsole ? { cookieOptions: { name: CONSOLE_COOKIE_NAME } } : {}),
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -40,7 +56,21 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  if (isConsole) {
+    // La console porte sa propre page de connexion et son propre callback :
+    // ils doivent rester joignables sans session.
+    const estPublic =
+      pathname === '/console/login' || pathname.startsWith('/console/auth');
+
+    if (!user && !estPublic) {
+      return NextResponse.redirect(new URL('/console/login', request.url));
+    }
+
+    // Le contrôle complet (allowlist d'emails + `is_super_admin`) se fait dans
+    // `getConsoleAdmin`. Ici on n'exige qu'une session : le proxy n'a pas
+    // accès à la base.
+    return response;
+  }
 
   // Le contrôle « est-ce un super-admin ? » se fait dans la page /admin elle-
   // même (lecture RLS de sa propre ligne). Ici, on ne fait qu'exiger une

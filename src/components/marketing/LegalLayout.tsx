@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { useT } from '@/lib/i18n/use-t';
+
 export type LegalSection = {
   /** Ancre de la section, utilisée pour le lien et le scrollspy. */
   id: string;
@@ -19,6 +21,7 @@ export type LegalSection = {
  * réglage supplémentaire.
  */
 export function LegalLayout({ sections }: { sections: LegalSection[] }) {
+  const t = useT();
   const [activeId, setActiveId] = useState(sections[0]?.id);
 
   useEffect(() => {
@@ -66,10 +69,10 @@ export function LegalLayout({ sections }: { sections: LegalSection[] }) {
               <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
               <path d="M9 11h6M9 15h6" />
             </svg>
-            Sommaire
+            {t.legalCommon.toc}
           </div>
 
-          <nav aria-label="Sommaire de la page" className="mt-4 space-y-1.5">
+          <nav aria-label={t.legalCommon.toc} className="mt-4 space-y-1.5">
             {sections.map((section, index) => {
               const active = section.id === activeId;
               return (

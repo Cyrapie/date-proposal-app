@@ -6,13 +6,16 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import { Heart } from '@/components/ui/Heart';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { CTA, NAV_LINKS } from '@/lib/marketing/nav';
+import { useT } from '@/lib/i18n/use-t';
+import { CTA_HREF, NAV_LINKS } from '@/lib/marketing/nav';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const t = useT();
 
   // La fermeture au clic est portée par les liens eux-mêmes (`onClick`) plutôt
   // que par un effet sur `pathname` : réagir à la navigation dans un effet
@@ -45,13 +48,13 @@ export function SiteHeader() {
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2 text-ink-900"
-          aria-label="Accueil"
+          aria-label={t.nav.homeAria}
         >
           <Heart className="h-5 w-5 text-bordeaux-500" />
           <span className="font-serif text-lg leading-none">Une invitation</span>
         </Link>
 
-        <nav aria-label="Navigation principale" className="hidden lg:block">
+        <nav aria-label={t.nav.mainNavLabel} className="hidden lg:block">
           <ul className="flex items-center gap-7">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
@@ -64,7 +67,7 @@ export function SiteHeader() {
                       : 'text-ink-600'
                   }`}
                 >
-                  {link.label}
+                  {t.nav[link.navKey]}
                 </Link>
               </li>
             ))}
@@ -72,13 +75,14 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <ThemeToggle />
 
           <Link
-            href={CTA.href}
+            href={CTA_HREF}
             className="hidden rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-ink transition hover:bg-accent-hover active:scale-[0.98] sm:block"
           >
-            {CTA.label}
+            {t.nav.cta}
           </Link>
 
           <button
@@ -86,7 +90,7 @@ export function SiteHeader() {
             onClick={() => setOpen((value) => !value)}
             aria-expanded={open}
             aria-controls="menu-mobile"
-            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-cream-300 text-ink-600 transition hover:border-bordeaux-500 lg:hidden"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
@@ -110,7 +114,7 @@ export function SiteHeader() {
             transition={{ duration: 0.25, ease: EASE_OUT_EXPO }}
             className="border-t border-cream-300 bg-cream-50 lg:hidden"
           >
-            <nav aria-label="Navigation mobile" className="mx-auto w-full max-w-6xl px-5 py-4">
+            <nav aria-label={t.nav.mobileNavLabel} className="mx-auto w-full max-w-6xl px-5 py-4">
               <ul className="space-y-1">
                 {NAV_LINKS.map((link) => (
                   <li key={link.href}>
@@ -124,18 +128,18 @@ export function SiteHeader() {
                           : 'text-ink-600 hover:bg-cream-300'
                       }`}
                     >
-                      {link.label}
+                      {t.nav[link.navKey]}
                     </Link>
                   </li>
                 ))}
               </ul>
 
               <Link
-                href={CTA.href}
+                href={CTA_HREF}
                 onClick={close}
                 className="mt-3 block rounded-full bg-accent px-6 py-3.5 text-center text-base font-medium text-accent-ink sm:hidden"
               >
-                {CTA.label}
+                {t.nav.cta}
               </Link>
             </nav>
           </motion.div>

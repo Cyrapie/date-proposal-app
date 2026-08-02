@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 
 import { themeBootScript } from "@/components/ui/ThemeToggle";
+import { languageBootScript } from "@/lib/i18n/language";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -58,6 +59,7 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: languageBootScript }} />
       </head>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

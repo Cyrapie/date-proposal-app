@@ -24,6 +24,13 @@ aussi :
 - **Quotas et tableau de bord Super Admin** (`/admin`) — KPIs, croissance,
   liste des créateurs, changement manuel de formule. Réservé aux comptes avec
   `users.is_super_admin = true` (attribué en base, jamais via l'interface).
+- **Console d'administration indépendante** (`/console`) — voir plus bas.
+- **Site vitrine bilingue FR/EN** — un bouton `FR`/`EN` dans l'en-tête, à côté
+  de la bascule clair/sombre. La préférence est retenue dans `localStorage` et
+  posée sur `<html>` avant le premier rendu, sans rechargement de page.
+  Couverture : vitrine, blog (articles traduits) et pages légales. Le
+  dashboard, l'admin, le parcours destinataire et les emails restent en
+  français.
 
 Pas encore fait : intégration de paiement réelle (voir « Prêt pour Stripe »
 plus bas).
@@ -174,6 +181,51 @@ la formule (voir `src/lib/data/quota.ts`) ; son dépassement renvoie une 402.
 Le changement de formule est aujourd'hui **manuel**, via le tableau de bord
 Super Admin (`/admin`) — aucun paiement réel n'est branché.
 
+## Console d'administration (`/console`)
+
+Espace d'exploitation séparé du produit : aucun lien depuis la vitrine ni
+depuis l'espace créateur, et **sa propre session**.
+
+Cette indépendance tient au préfixe de cookie. Le client créateur utilise le
+préfixe `sb-` par défaut, la console écrit sous `otyche-console`
+(`src/lib/supabase/console.ts`). Les deux sessions cohabitent sur le même
+domaine sans se voir : se connecter à la console ne connecte pas à
+`/dashboard`, et se déconnecter de l'une laisse l'autre intacte.
+
+**Trois barrières cumulatives** pour entrer (`src/lib/console/guard.ts`) :
+
+1. une session valide sur le cookie console ;
+2. l'adresse figure dans l'allowlist de `src/lib/console/access.ts`
+   (`bcyrapie.mail@gmail.com` par défaut, surchargeable par
+   `CONSOLE_ADMIN_EMAILS`) ;
+3. `users.is_super_admin` est vrai en base.
+
+Aucune ne suffit seule — un accès en écriture à la table `users` ne permet pas
+de s'auto-promouvoir, l'allowlist vivant dans le code. La connexion se fait par
+**email + mot de passe** sur `/console/login` — volontairement différent du
+lien magique utilisé partout ailleurs dans l'app, pour un opérateur unique qui
+se reconnecte souvent depuis un poste fixe. Le même message d'erreur sert pour
+« email non autorisé » et « mot de passe incorrect », pour ne pas transformer
+le formulaire en oracle. Le mot de passe se gère depuis le tableau de bord
+Supabase (Authentication → Users → sélectionner le compte → « Reset
+password ») ; il n'existe pas d'écran « mot de passe oublié » dans la console
+elle-même.
+
+| Page | Contenu |
+| --- | --- |
+| `/console` | KPIs, croissance, revenu estimé, dernières actions |
+| `/console/utilisateurs` | Formule, suspension, suppression définitive |
+| `/console/invitations` | Toutes les invitations, détail, désactivation, suppression |
+| `/console/journal` | Trace horodatée de chaque action d'administration |
+| `/console/systeme` | Santé de la base, purges en attente, présence des variables d'env |
+
+**Suspension** — `users.suspended_at`. Un compte suspendu conserve ses données
+et ses invitations déjà envoyées restent consultables par leurs destinataires,
+mais la création est refusée côté serveur (403 dans `POST /api/proposals`).
+
+**Journal** — chaque action écrit dans `admin_audit_log`. Aucune route de
+l'application ne met à jour ni ne supprime ces lignes.
+
 ## Sécurité
 
 RLS est activé sur toutes les tables : avec la clé anon, un créateur ne voit que
@@ -232,6 +284,7 @@ src/
 │  ├─ calendar/            génération .ics et lien Google
 │  ├─ data/                accès aux propositions
 │  ├─ domain/              types d'occasion, thèmes, slugs
+│  ├─ i18n/                dictionnaire FR/EN et contexte de langue
 │  ├─ email/               templates et envoi Resend
 │  ├─ supabase/            clients navigateur / serveur / service_role
 │  ├─ validation/          schémas Zod

@@ -14,6 +14,19 @@ export type UserRow = {
   plan: 'free' | 'premium' | 'gold';
   /** Accès total au tableau de bord /admin. Attribué manuellement en base. */
   is_super_admin: boolean;
+  /** Non nul = compte suspendu : la création d'invitation est refusée. */
+  suspended_at: string | null;
+  created_at: string;
+};
+
+export type AdminAuditLogRow = {
+  id: string;
+  actor_email: string;
+  action: string;
+  target_type: string | null;
+  target_id: string | null;
+  target_label: string | null;
+  details: Record<string, unknown>;
   created_at: string;
 };
 
@@ -97,6 +110,11 @@ export type Database = {
         Omit<ResponseRow, 'id' | 'responded_at'> &
           Partial<Pick<ResponseRow, 'id' | 'responded_at'>>
       >;
+      admin_audit_log: Table<
+        AdminAuditLogRow,
+        Omit<AdminAuditLogRow, 'id' | 'created_at'> &
+          Partial<Pick<AdminAuditLogRow, 'id' | 'created_at'>>
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -115,6 +133,33 @@ export type Database = {
       admin_list_creators: {
         Args: Record<string, never>;
         Returns: unknown;
+      };
+      console_list_proposals: {
+        Args: Record<string, never>;
+        Returns: unknown;
+      };
+      console_get_proposal: {
+        Args: { p_id: string };
+        Returns: unknown;
+      };
+      console_list_audit: {
+        Args: { p_limit?: number };
+        Returns: unknown;
+      };
+      console_system_health: {
+        Args: Record<string, never>;
+        Returns: unknown;
+      };
+      console_log_action: {
+        Args: {
+          p_actor_email: string;
+          p_action: string;
+          p_target_type?: string | null;
+          p_target_id?: string | null;
+          p_target_label?: string | null;
+          p_details?: Record<string, unknown>;
+        };
+        Returns: void;
       };
     };
     Enums: Record<string, never>;

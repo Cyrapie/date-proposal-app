@@ -4,6 +4,7 @@ import { useCallback, useState, type FormEvent } from 'react';
 
 import { MarketingField, marketingInputClass } from '@/components/marketing/MarketingField';
 import { Turnstile } from '@/components/marketing/Turnstile';
+import { useT } from '@/lib/i18n/use-t';
 import type { InquiryKind } from '@/lib/validation/inquiry';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
@@ -19,6 +20,7 @@ export function InquiryForm({
   messagePlaceholder: string;
   submitLabel: string;
 }) {
+  const t = useT();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
@@ -47,12 +49,12 @@ export function InquiryForm({
       });
 
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.error ?? "L'envoi a échoué.");
+      if (!res.ok) throw new Error(body?.error ?? t.inquiryForm.genericError);
 
       setStatus('sent');
     } catch (caught) {
       setStatus('error');
-      setError(caught instanceof Error ? caught.message : "L'envoi a échoué.");
+      setError(caught instanceof Error ? caught.message : t.inquiryForm.genericError);
     }
   }
 
@@ -62,10 +64,9 @@ export function InquiryForm({
         role="status"
         className="rounded-[var(--radius-card)] border border-cream-300 bg-cream-50 p-8 text-center"
       >
-        <p className="font-serif text-2xl font-extrabold text-bordeaux-600">Message reçu</p>
+        <p className="font-serif text-2xl font-extrabold text-bordeaux-600">{t.inquiryForm.sentTitle}</p>
         <p className="mt-3 text-sm leading-relaxed text-ink-400">
-          Merci {name.split(' ')[0] || ''}. Nous revenons vers vous à l’adresse{' '}
-          <span className="font-medium text-ink-600">{email}</span>.
+          {t.inquiryForm.sentBody(name.split(' ')[0] || '', email)}
         </p>
       </div>
     );
@@ -73,7 +74,7 @@ export function InquiryForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <MarketingField label="Votre nom" htmlFor="name" required>
+      <MarketingField label={t.inquiryForm.nameLabel} htmlFor="name" required>
         <input
           id="name"
           value={name}
@@ -85,7 +86,7 @@ export function InquiryForm({
         />
       </MarketingField>
 
-      <MarketingField label="Votre email" htmlFor="email" required>
+      <MarketingField label={t.inquiryForm.emailLabel} htmlFor="email" required>
         <input
           id="email"
           type="email"
@@ -100,7 +101,7 @@ export function InquiryForm({
       </MarketingField>
 
       {kind === 'partner' ? (
-        <MarketingField label="Votre structure" htmlFor="company" hint="Restaurant, salle, agence…">
+        <MarketingField label={t.inquiryForm.companyLabel} htmlFor="company" hint={t.inquiryForm.companyHint}>
           <input
             id="company"
             value={company}
@@ -128,7 +129,7 @@ export function InquiryForm({
 
       {/* Piège à robots : invisible et hors du parcours clavier. */}
       <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
-        <label htmlFor="website">Ne pas remplir</label>
+        <label htmlFor="website">{t.inquiryForm.robotTrapLabel}</label>
         <input
           id="website"
           name="website"
@@ -152,13 +153,10 @@ export function InquiryForm({
         disabled={status === 'sending'}
         className="w-full rounded-full bg-accent px-6 py-4 text-base font-medium text-accent-ink transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-60 sm:w-auto sm:px-10"
       >
-        {status === 'sending' ? 'Envoi…' : submitLabel}
+        {status === 'sending' ? t.inquiryForm.sending : submitLabel}
       </button>
 
-      <p className="text-xs leading-relaxed text-ink-400">
-        Vos coordonnées servent uniquement à répondre à cette demande. Elles ne sont ni revendues,
-        ni utilisées pour de la prospection.
-      </p>
+      <p className="text-xs leading-relaxed text-ink-400">{t.inquiryForm.privacyNote}</p>
     </form>
   );
 }

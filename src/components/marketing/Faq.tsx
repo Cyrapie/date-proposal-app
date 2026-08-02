@@ -1,40 +1,24 @@
-export type FaqItem = { q: string; a: string };
+'use client';
 
-export const HOME_FAQ: FaqItem[] = [
-  {
-    q: 'La personne qui reçoit doit-elle créer un compte ?',
-    a: 'Non. Elle ouvre le lien, découvre l’invitation, choisit le lieu et le créneau. Aucun compte, aucun mot de passe, aucune application.',
-  },
-  {
-    q: 'Vous connectez-vous à mon agenda ?',
-    a: 'Jamais. Nous produisons un fichier .ics et un lien Google Calendar pré-rempli. Rien n’entre dans votre calendrier sans votre clic.',
-  },
-  {
-    q: 'Est-ce un site de rencontre ?',
-    a: 'Non. Nous ne mettons personne en relation. L’outil sert à inviter quelqu’un que vous connaissez déjà : un conjoint, un ami, une personne rencontrée ailleurs.',
-  },
-  {
-    q: 'Combien de temps le lien reste-t-il valable ?',
-    a: 'Entre 7 et 90 jours, vous choisissez à la création. Passé ce délai le contenu n’est plus consultable, puis il est supprimé de nos serveurs.',
-  },
-  {
-    q: 'Et si la personne dit non ?',
-    a: 'Le bouton « Non » se dérobe et finit par ne plus répondre. C’est une plaisanterie assumée. Un vrai refus se dit de vive voix, pas en cliquant.',
-  },
-];
+import { useT } from '@/lib/i18n/use-t';
+
+export type FaqItem = { q: string; a: string };
 
 /**
  * Accordéon en HTML natif (`<details>`) : accessible au clavier et fonctionnel
- * sans JavaScript, donc sans coût d'hydratation sur une page marketing.
+ * sans JavaScript pour le contenu — seul l'intitulé de section réagit à la
+ * langue courante.
  */
-export function Faq({ items = HOME_FAQ }: { items?: FaqItem[] }) {
+export function Faq({ items }: { items: FaqItem[] }) {
+  const t = useT();
+
   return (
     <section className="mx-auto w-full max-w-3xl px-5 py-20">
       <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-bordeaux-500">
-        Questions fréquentes
+        {t.faqHeading.eyebrow}
       </p>
       <h2 className="mt-4 text-center font-serif text-4xl font-black leading-[1.06] text-ink-900">
-        Ce qu’on nous demande
+        {t.faqHeading.title}
       </h2>
 
       <div className="mt-10 space-y-3">

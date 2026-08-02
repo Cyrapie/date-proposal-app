@@ -1,11 +1,17 @@
-/** Source unique de la navigation du site vitrine (header, footer, plan du site). */
-export const NAV_LINKS = [
-  { href: '/', label: 'Accueil' },
-  { href: '/tarifs', label: 'Tarifs' },
-  { href: '/partenaires', label: 'Devenir partenaire' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/a-propos', label: 'À propos' },
-  { href: '/contact', label: 'Contact' },
-] as const;
+import type { Dictionary } from '@/lib/i18n/dictionary';
 
-export const CTA = { href: '/dashboard/new', label: 'Créer mon date' } as const;
+/**
+ * Source unique de la navigation du site vitrine (header, footer, plan du
+ * site). Les libellés viennent du dictionnaire i18n via `navKey` ; seuls les
+ * chemins sont fixes ici.
+ */
+export const NAV_LINKS = [
+  { href: '/', navKey: 'home' },
+  { href: '/tarifs', navKey: 'pricing' },
+  { href: '/partenaires', navKey: 'partners' },
+  { href: '/blog', navKey: 'blog' },
+  { href: '/a-propos', navKey: 'about' },
+  { href: '/contact', navKey: 'contact' },
+] as const satisfies ReadonlyArray<{ href: string; navKey: keyof Dictionary['nav'] }>;
+
+export const CTA_HREF = '/dashboard/new';

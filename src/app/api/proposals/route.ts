@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { getQuotaState, getUserPlan } from '@/lib/data/quota';
+import { getQuotaState, getUserPlan, isUserSuspended } from '@/lib/data/quota';
 import { generateSlug, proposalUrl } from '@/lib/domain/slug';
 import { publicEnv } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
@@ -38,6 +38,18 @@ export async function POST(request: NextRequest) {
         })),
       },
       { status: 422 },
+    );
+  }
+
+  // Suspension prononcée depuis la console. Contrôlée avant le quota : un
+  // compte suspendu n'a pas à savoir où il en est de son plafond.
+  if (await isUserSuspended(user.id)) {
+    return NextResponse.json(
+      {
+        error:
+          'Votre compte est suspendu. Vos invitations déjà envoyées restent actives, mais la création est bloquée. Contactez-nous pour en savoir plus.',
+      },
+      { status: 403 },
     );
   }
 

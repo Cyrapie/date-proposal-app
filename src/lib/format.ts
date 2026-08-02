@@ -42,6 +42,18 @@ export function formatShortDate(value: string | Date): string {
   return SHORT_DATE.format(new Date(value));
 }
 
+const SHORT_DATE_EN = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
+
+/** Date courte du site vitrine, qui suit la langue choisie par le visiteur. */
+export function formatShortDateIn(value: string | Date, lang: 'fr' | 'en'): string {
+  const date = new Date(value);
+  return lang === 'en' ? SHORT_DATE_EN.format(date) : SHORT_DATE.format(date);
+}
+
 /** « Samedi 8 août, 20:00 – 22:30 » */
 export function formatSlotRange(start: string | Date, end: string | Date): string {
   const startDate = new Date(start);
