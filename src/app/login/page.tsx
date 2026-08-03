@@ -1,7 +1,6 @@
-import Link from 'next/link';
-
 import { LoginForm } from '@/components/auth/LoginForm';
-import { Heart } from '@/components/ui/Heart';
+import { LoginFooterLinks, LoginHeader } from '@/components/auth/LoginIntro';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { publicEnv } from '@/lib/env';
 
@@ -20,17 +19,16 @@ export default async function LoginPage({
 
   return (
     <main className="relative flex min-h-dvh flex-col items-center justify-center px-5 py-12">
-      <div className="absolute right-5 top-5">
+      {/* Le sélecteur de langue est ici aussi : c'est la première page qu'un
+          créateur anglophone voit s'il arrive par un lien direct. */}
+      <div className="absolute right-5 top-5 flex items-center gap-2">
+        <LanguageToggle />
         <ThemeToggle />
       </div>
 
       <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <Heart className="mx-auto mb-4 h-8 w-8 text-bordeaux-500" />
-          <h1 className="font-serif text-3xl font-black leading-[1.06] text-ink-900">Bon retour</h1>
-          <p className="mt-2 text-sm leading-relaxed text-ink-400">
-            Entrez votre email : vous recevrez un lien de connexion, sans mot de passe.
-          </p>
+        <div className="mb-8">
+          <LoginHeader />
         </div>
 
         {configured ? (
@@ -47,15 +45,7 @@ export default async function LoginPage({
           </div>
         )}
 
-        <p className="mt-8 text-center text-xs text-ink-400">
-          <Link href="/" className="underline underline-offset-4 hover:text-ink-600">
-            Retour à l&apos;accueil
-          </Link>
-          <span className="mx-2">·</span>
-          <Link href="/privacy" className="underline underline-offset-4 hover:text-ink-600">
-            Confidentialité
-          </Link>
-        </p>
+        <LoginFooterLinks />
       </div>
     </main>
   );

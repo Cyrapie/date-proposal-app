@@ -1,6 +1,11 @@
+'use client';
+
 import { themeStyle, type Theme } from '@/lib/domain/themes';
+import { useT } from '@/lib/i18n/use-t';
 
 export function ExpiredLink({ theme }: { theme: Theme }) {
+  const t = useT();
+
   return (
     <main
       className="themed flex min-h-dvh flex-col items-center justify-center px-6 py-12 text-center"
@@ -10,13 +15,17 @@ export function ExpiredLink({ theme }: { theme: Theme }) {
         <p className="font-serif text-5xl" aria-hidden="true">
           🕰️
         </p>
-        <h1 className="mt-6 font-serif text-3xl" style={{ color: 'var(--theme-accent)' }}>
-          Ce lien a expiré
+        <p
+          className="mt-6 text-xs uppercase tracking-[0.18em]"
+          style={{ color: 'var(--theme-muted)' }}
+        >
+          {t.recipient.expired.eyebrow}
+        </p>
+        <h1 className="mt-3 font-serif text-3xl" style={{ color: 'var(--theme-accent)' }}>
+          {t.recipient.expired.title}
         </h1>
         <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--theme-muted)' }}>
-          Les invitations ont une durée de vie limitée : passé ce délai, leur contenu n&apos;est
-          plus consultable. Demandez à la personne qui vous l&apos;a envoyée d&apos;en générer une
-          nouvelle.
+          {t.recipient.expired.body}
         </p>
       </div>
     </main>

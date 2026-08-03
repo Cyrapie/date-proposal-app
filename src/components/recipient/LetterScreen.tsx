@@ -3,8 +3,9 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-import { anyTypeMeta } from '@/lib/domain/proposal';
 import type { PublicProposal } from '@/components/recipient/types';
+import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 const container = {
@@ -27,7 +28,9 @@ export function LetterScreen({
   proposal: PublicProposal;
   onContinue: () => void;
 }) {
-  const meta = anyTypeMeta(proposal.type);
+  const t = useT();
+  const typeMeta = useTypeMeta();
+  const meta = typeMeta(proposal.type);
 
   return (
     <motion.div
@@ -48,12 +51,23 @@ export function LetterScreen({
           borderColor: 'var(--theme-border)',
         }}
       >
+        {/* L'icône de l'occasion tient lieu de vignette : elle annonce le ton
+            avant même la lecture du message. */}
+        <motion.div
+          variants={item}
+          className="flex h-14 w-14 items-center justify-center rounded-full text-2xl"
+          style={{ background: 'var(--theme-accent-soft)' }}
+          aria-hidden="true"
+        >
+          {meta.emoji}
+        </motion.div>
+
         <motion.p
           variants={item}
-          className="text-xs uppercase tracking-[0.18em]"
+          className="mt-5 text-xs uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          C&apos;est noté
+          {t.recipient.letter.eyebrow}
         </motion.p>
 
         <motion.h1
@@ -61,7 +75,7 @@ export function LetterScreen({
           className="mt-3 font-serif text-3xl leading-tight sm:text-4xl"
           style={{ color: 'var(--theme-accent)' }}
         >
-          {meta.headline} <span aria-hidden="true">{meta.emoji}</span>
+          {meta.headline}
         </motion.h1>
 
         {proposal.photoUrl ? (
@@ -101,7 +115,7 @@ export function LetterScreen({
               color: 'var(--theme-accent-ink)',
             }}
           >
-            Continuer
+            {t.recipient.letter.continue}
           </button>
         </motion.div>
       </motion.article>

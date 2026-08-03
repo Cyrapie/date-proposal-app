@@ -32,10 +32,12 @@ export function BlogTeaserView({ posts }: { posts: Post[] }) {
       </div>
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
+            data-reveal
+            style={{ '--reveal-delay': `${index * 80}ms` } as React.CSSProperties}
             className="bloc group flex flex-col p-7"
           >
             <p className="text-xs text-ink-400">

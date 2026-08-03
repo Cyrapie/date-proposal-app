@@ -14,7 +14,7 @@ export function ContactPageContent() {
         <p>{t.contactPage.intro}</p>
       </PageHeader>
 
-      <div className="mx-auto w-full max-w-2xl px-5 py-16">
+      <div data-reveal className="mx-auto w-full max-w-2xl px-5 py-16">
         <h2 className="font-serif text-3xl font-black text-ink-900">{t.contactPage.writeUs}</h2>
         <p className="mt-2 mb-8 text-sm leading-relaxed text-ink-400">{t.contactPage.hint}</p>
         <InquiryForm

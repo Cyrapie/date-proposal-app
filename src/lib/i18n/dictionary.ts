@@ -29,6 +29,7 @@ const fr = {
     tagline: 'Proposez un rendez-vous en un lien. La personne choisit, et tout part dans vos agendas.',
     siteHeading: 'Le site',
     accountHeading: 'Votre compte',
+    legalHeading: 'Juridique',
     login: 'Se connecter',
     myInvitations: 'Mes invitations',
     confidentiality: 'Confidentialité',
@@ -37,6 +38,7 @@ const fr = {
     community: 'Règles de la communauté',
     terms: 'Conditions générales',
     legal: 'Mentions légales',
+    rights: 'Tous droits réservés.',
   },
 
   home: {
@@ -601,6 +603,250 @@ const fr = {
       },
     ],
   },
+
+  common: {
+    backToTop: 'Revenir en haut',
+    optional: 'facultatif',
+  },
+
+  /**
+   * Libellés des occasions, individuelles puis de groupe. L'emoji reste dans
+   * `lib/domain/proposal.ts` : il ne dépend pas de la langue, contrairement au
+   * libellé et au titre affiché sur la lettre.
+   */
+  typeMeta: {
+    cinema: { label: 'Cinéma', headline: 'Une séance de cinéma' },
+    restaurant: { label: 'Restaurant', headline: 'Un dîner en tête-à-tête' },
+    weekend: { label: 'Weekend ou voyage', headline: 'Une escapade à deux' },
+    activity: { label: 'Activité', headline: 'Une activité ensemble' },
+    surprise: { label: 'Surprise (lieu caché)', headline: 'Une surprise' },
+    birthday: { label: 'Anniversaire', headline: 'Un anniversaire à fêter' },
+    just_because: { label: 'Juste comme ça', headline: 'Juste comme ça' },
+    friends: { label: 'Entre amis', headline: 'Une sortie entre amis' },
+    club: { label: 'Club', headline: 'Une sortie de club' },
+    colleagues: { label: 'Collègues', headline: 'Un moment entre collègues' },
+    events: { label: 'Événement', headline: 'Un événement à ne pas manquer' },
+    chill: { label: 'Chill', headline: 'Un moment tranquille' },
+    afterwork: { label: 'Afterwork', headline: 'Un afterwork' },
+  },
+
+  /** Thèmes visuels : seuls les libellés sont ici, les couleurs restent dans le domaine. */
+  themeMeta: {
+    classic: {
+      label: 'Classique',
+      description: 'Crème et bordeaux profond, esprit papier à lettres.',
+    },
+    fun: { label: 'Coloré', description: 'Pêche et framboise, plus vif et joueur.' },
+    midnight: { label: 'Nuit', description: 'Bleu nuit et or doux, pour les invitations du soir.' },
+  },
+
+  /** Parcours destinataire : une entrée par étape, dans l'ordre du parcours. */
+  recipient: {
+    envelope: {
+      eyebrow: (name: string) => `Pour ${name}`,
+      title: 'Une invitation vous attend',
+      openAria: 'Ouvrir la lettre',
+      hint: 'Touche la lettre',
+    },
+    letter: {
+      eyebrow: 'C’est noté',
+      continue: 'Continuer',
+    },
+    decision: {
+      eyebrow: (name: string) => `Pour toi, ${name}`,
+      title: 'Ça te dit un date avec moi ?',
+      yes: 'Oui',
+      no: 'Non',
+      tease: ['Essaie encore', 'Tu es sûr ?', 'Non non', 'Pas cette fois', 'Vraiment ?'],
+    },
+    group: {
+      eyebrow: 'Invitation de groupe',
+      title: 'Vous êtes invité',
+      titleFull: 'C’est complet — rejoignez la liste d’attente',
+      bodyFull:
+        'Toutes les places sont prises, mais vous pouvez rejoindre la liste d’attente : vous serez prévenu automatiquement si une place se libère.',
+      remaining: (left: number, capacity: number) =>
+        `${left} place${left > 1 ? 's' : ''} restante${left > 1 ? 's' : ''} sur ${capacity}.`,
+      join: 'Je participe',
+      joinFull: 'Rejoindre la liste d’attente',
+    },
+    selection: {
+      eyebrow: 'Presque fini',
+      title: 'À toi de choisir',
+      nameLabel: 'Ton prénom',
+      namePlaceholder: 'Pour qu’on te reconnaisse dans la liste',
+      locationLegend: 'Le lieu',
+      mapLink: 'Voir sur la carte',
+      hiddenLocation: 'Le lieu reste une surprise 🤫',
+      slotLegend: 'Le créneau',
+      counterToggle: 'Aucun ne me va, je propose autre chose',
+      counterIntro:
+        'Proposez votre créneau. La personne qui vous a invité recevra votre proposition et pourra la confirmer.',
+      counterDayLabel: 'Le jour',
+      counterStartAria: 'Heure de début proposée',
+      counterEndAria: 'Heure de fin proposée',
+      counterLocationPlaceholder: 'Un lieu, si vous en avez un en tête (facultatif)',
+      noteLabel: 'Un mot pour moi',
+      notePlaceholder: 'Hâte d’y être…',
+      emailLabel: 'Ton email',
+      emailPlaceholder: 'pour recevoir ta confirmation + l’invitation agenda',
+      emailHint: 'Utilisé uniquement pour t’envoyer cette confirmation. Rien d’autre.',
+      submitting: 'On envoie…',
+      submitCounter: 'Proposer cette date',
+      submit: 'C’est validé',
+      genericError: 'Une erreur est survenue.',
+      saveError: 'Enregistrement impossible. Réessayez.',
+    },
+    confirmation: {
+      eyebrow: 'C’est envoyé',
+      title: 'Parfait',
+      titleCountered: 'Bien reçu',
+      titleWaitlisted: 'Vous êtes sur la liste',
+      waitlistBody: (position: number | null) =>
+        `Toutes les places sont prises pour l’instant${
+          position ? ` — vous êtes en position ${position}` : ''
+        }. Vous serez prévenu par email si une place se libère.`,
+      when: 'Quand',
+      whenCountered: 'Votre proposition',
+      where: 'Où',
+      yourNote: 'Ton mot',
+      mapLink: 'Voir sur la carte',
+      addToCalendar: 'Ajouter à mon calendrier',
+      openGoogle: 'Ouvrir dans Google Calendar',
+      footer: 'C’est envoyé. À très vite.',
+      footerCountered: 'Votre proposition est transmise. Vous recevrez une confirmation.',
+    },
+    cancel: {
+      eyebrow: 'Votre place',
+      title: 'Annuler votre place ?',
+      body: 'Votre place sera libérée pour la personne suivante sur la liste d’attente, si elle existe.',
+      confirm: 'Confirmer l’annulation',
+      cancelling: 'Annulation…',
+      done: 'Votre place est annulée. Merci de nous avoir prévenus.',
+      error: 'Ce lien n’est plus valide, ou votre place a déjà été annulée.',
+      invalidLink: 'Lien invalide.',
+    },
+    expired: {
+      eyebrow: 'Lien expiré',
+      title: 'Ce lien a expiré',
+      body: 'Les invitations ont une durée de vie limitée : passé ce délai, leur contenu n’est plus consultable. Demandez à la personne qui vous l’a envoyée d’en générer une nouvelle.',
+    },
+  },
+
+  /** Formulaire de création, côté créateur. */
+  proposalForm: {
+    sectionWho: 'À qui',
+    sectionWhoHint: 'Le destinataire et le type d’occasion.',
+    sectionContent: 'Le contenu',
+    sectionContentHint: 'Ce que la personne verra en ouvrant la lettre.',
+    sectionWhereWhen: 'Où et quand',
+    sectionWhereWhenHint: 'Les choix que vous laissez à la personne.',
+    sectionLook: 'L’apparence',
+    sectionLookHint: 'Le thème visuel et la durée de vie du lien.',
+
+    audienceLabel: 'Qui peut venir',
+    audienceOne: 'Une personne',
+    audienceOneHint: 'Le parcours classique',
+    audienceGroup: 'Un groupe',
+    audienceGroupHint: 'Capacité à définir',
+    audienceGroupLocked: '🔒 Un groupe',
+    audienceGroupLockedHint: 'Réservé à Premium Gold',
+
+    nameLabel: 'Son prénom',
+    nameLabelGroup: 'Nom du groupe ou de l’occasion',
+    namePlaceholder: 'Camille',
+    namePlaceholderGroup: 'Afterwork équipe design',
+
+    occasionLabel: 'L’occasion',
+
+    capacityLabel: 'Nombre de places',
+    capacityHint: (min: number, max: number) =>
+      `De ${min} à ${max}. Au-delà, les personnes rejoignent une liste d’attente et sont prévenues automatiquement si une place se libère.`,
+
+    messageLabel: 'Votre message',
+    messageHint: 'Il s’affichera sur la lettre, en écriture serif.',
+    messagePlaceholder: 'J’ai pensé qu’on pourrait…',
+    messageSuggestionsAria: 'Messages suggérés',
+
+    photoLabel: 'Une photo',
+
+    locationsLabel: 'Les lieux',
+    locationsLabelHidden: 'Les lieux (masqués au destinataire)',
+    locationsHint: (max: number) => `De 1 à ${max} propositions.`,
+    locationsHintHidden: 'Occasion surprise : le lieu ne sera pas révélé avant l’acceptation.',
+    addLocation: '+ Ajouter un lieu',
+
+    slotsLabel: 'Les créneaux',
+    slotsHint: (max: number) => `De 1 à ${max} propositions.`,
+    slotNumber: (index: number) => `Créneau ${index}`,
+    removeSlot: 'Retirer',
+    startTimeAria: 'Heure de début',
+    endTimeAria: 'Heure de fin',
+    addSlot: '+ Ajouter un créneau',
+
+    themeLabel: 'Le thème visuel',
+
+    expiryLabel: 'Durée de validité du lien',
+    expiryHint: 'RGPD : passé ce délai, le lien n’est plus consultable.',
+    expiryDays: (days: number) => `${days} jours`,
+
+    submit: 'Générer le lien',
+    submitting: 'Création…',
+
+    errorNoLocation: 'Proposez au moins un lieu.',
+    errorSlotOrder: 'Chaque créneau doit se terminer après son début.',
+    errorNoSlot: 'Proposez au moins un créneau complet (date, début et fin).',
+    errorCreate: 'Création impossible.',
+
+    doneTitle: 'Votre lien est prêt',
+    doneBodyGroup: (capacity: number) =>
+      `Partagez-le au groupe : ${capacity} places, vous serez notifié par email à chaque réponse.`,
+    doneBody: (name: string) =>
+      `Envoyez-le à ${name}. Vous serez notifié par email dès la réponse.`,
+    doneBodyFallback: 'la personne concernée',
+    donePreview: 'Aperçu',
+    doneFinish: 'Terminer',
+  },
+
+  /** Connexion créateur (lien magique). */
+  authForm: {
+    eyebrow: 'Espace créateur',
+    title: 'Bon retour',
+    subtitle: 'Entrez votre email : vous recevrez un lien de connexion, sans mot de passe.',
+    emailLabel: 'Votre email',
+    emailPlaceholder: 'vous@exemple.fr',
+    submit: 'Recevoir mon lien',
+    submitting: 'Envoi…',
+    privacyNote: 'Votre email sert uniquement à vous connecter et à vous notifier des réponses.',
+    sentTitle: 'Regardez vos emails',
+    sentBody: (email: string) =>
+      `Un lien de connexion vient de partir vers ${email}. Il est valable une heure.`,
+    sentRetry: 'Utiliser une autre adresse',
+    sendError: 'Envoi impossible. Vérifiez l’adresse et réessayez.',
+    backHome: 'Retour à l’accueil',
+    privacyLink: 'Confidentialité',
+  },
+
+  /** Titres des pages applicatives, alignés sur le motif de la vitrine. */
+  appPages: {
+    newEyebrow: 'Nouvelle invitation',
+    newTitle: 'Créer une invitation',
+    newSubtitle:
+      'Vous obtiendrez un lien unique à envoyer. La personne choisira le lieu et le créneau parmi vos propositions.',
+    newBack: '← Mes invitations',
+    newQuotaReached:
+      'Vous reprendrez la création le mois prochain, ou dès que vous changerez de formule.',
+  },
+
+  quotaBadge: {
+    count: (used: number, max: number) => `${used} / ${max} invitations ce mois-ci`,
+    planLine: (plan: string, date: string) => `Formule ${plan} · remise à zéro le ${date}`,
+    progressAria: 'Invitations créées ce mois-ci',
+    reached: 'Limite atteinte. Vos invitations déjà envoyées continuent de fonctionner normalement.',
+    remaining: (left: number) =>
+      `Plus que ${left} invitation${left > 1 ? 's' : ''} avant la fin du mois.`,
+    seePlans: 'Voir les formules',
+  },
 };
 
 const en: typeof fr = {
@@ -623,6 +869,7 @@ const en: typeof fr = {
     tagline: 'Propose a date with a single link. They choose, and it lands straight in both your calendars.',
     siteHeading: 'Site',
     accountHeading: 'Your account',
+    legalHeading: 'Legal',
     login: 'Log in',
     myInvitations: 'My invitations',
     confidentiality: 'Privacy',
@@ -631,6 +878,7 @@ const en: typeof fr = {
     community: 'Community guidelines',
     terms: 'Terms of service',
     legal: 'Legal notice',
+    rights: 'All rights reserved.',
   },
 
   home: {
@@ -1190,6 +1438,235 @@ const en: typeof fr = {
         ],
       },
     ],
+  },
+
+  common: {
+    backToTop: 'Back to top',
+    optional: 'optional',
+  },
+
+  typeMeta: {
+    cinema: { label: 'Cinema', headline: 'A trip to the movies' },
+    restaurant: { label: 'Restaurant', headline: 'Dinner, just the two of us' },
+    weekend: { label: 'Weekend or trip', headline: 'A getaway for two' },
+    activity: { label: 'Activity', headline: 'Something to do together' },
+    surprise: { label: 'Surprise (hidden place)', headline: 'A surprise' },
+    birthday: { label: 'Birthday', headline: 'A birthday to celebrate' },
+    just_because: { label: 'Just because', headline: 'Just because' },
+    friends: { label: 'With friends', headline: 'A night out with friends' },
+    club: { label: 'Club', headline: 'A club outing' },
+    colleagues: { label: 'Colleagues', headline: 'Time with colleagues' },
+    events: { label: 'Event', headline: 'An event not to miss' },
+    chill: { label: 'Chill', headline: 'Something low-key' },
+    afterwork: { label: 'Afterwork', headline: 'An afterwork' },
+  },
+
+  themeMeta: {
+    classic: { label: 'Classic', description: 'Cream and deep burgundy, a letter-paper feel.' },
+    fun: { label: 'Colourful', description: 'Peach and raspberry, brighter and more playful.' },
+    midnight: { label: 'Midnight', description: 'Deep blue and soft gold, for evening invitations.' },
+  },
+
+  recipient: {
+    envelope: {
+      eyebrow: (name: string) => `For ${name}`,
+      title: 'An invitation is waiting for you',
+      openAria: 'Open the letter',
+      hint: 'Tap the letter',
+    },
+    letter: {
+      eyebrow: 'Here it is',
+      continue: 'Continue',
+    },
+    decision: {
+      eyebrow: (name: string) => `For you, ${name}`,
+      title: 'How about a date with me?',
+      yes: 'Yes',
+      no: 'No',
+      tease: ['Try again', 'Are you sure?', 'Nope', 'Not this time', 'Really?'],
+    },
+    group: {
+      eyebrow: 'Group invitation',
+      title: 'You’re invited',
+      titleFull: 'It’s full — join the waiting list',
+      bodyFull:
+        'Every spot is taken, but you can join the waiting list: you’ll be notified automatically if one frees up.',
+      remaining: (left: number, capacity: number) =>
+        `${left} spot${left > 1 ? 's' : ''} left out of ${capacity}.`,
+      join: 'Count me in',
+      joinFull: 'Join the waiting list',
+    },
+    selection: {
+      eyebrow: 'Almost done',
+      title: 'Your turn to choose',
+      nameLabel: 'Your first name',
+      namePlaceholder: 'So people recognise you on the list',
+      locationLegend: 'The place',
+      mapLink: 'View on the map',
+      hiddenLocation: 'The place stays a surprise 🤫',
+      slotLegend: 'The time slot',
+      counterToggle: 'None of these work, let me suggest another',
+      counterIntro:
+        'Suggest your own slot. Whoever invited you will get your suggestion and can confirm it.',
+      counterDayLabel: 'The day',
+      counterStartAria: 'Suggested start time',
+      counterEndAria: 'Suggested end time',
+      counterLocationPlaceholder: 'A place, if you have one in mind (optional)',
+      noteLabel: 'A word for me',
+      notePlaceholder: 'Can’t wait…',
+      emailLabel: 'Your email',
+      emailPlaceholder: 'to get your confirmation + the calendar invite',
+      emailHint: 'Used only to send you this confirmation. Nothing else.',
+      submitting: 'Sending…',
+      submitCounter: 'Suggest this date',
+      submit: 'It’s a yes',
+      genericError: 'Something went wrong.',
+      saveError: 'Could not save. Please try again.',
+    },
+    confirmation: {
+      eyebrow: 'All set',
+      title: 'Perfect',
+      titleCountered: 'Got it',
+      titleWaitlisted: 'You’re on the list',
+      waitlistBody: (position: number | null) =>
+        `Every spot is taken for now${
+          position ? ` — you’re number ${position}` : ''
+        }. You’ll get an email if one frees up.`,
+      when: 'When',
+      whenCountered: 'Your suggestion',
+      where: 'Where',
+      yourNote: 'Your note',
+      mapLink: 'View on the map',
+      addToCalendar: 'Add to my calendar',
+      openGoogle: 'Open in Google Calendar',
+      footer: 'It’s sent. See you soon.',
+      footerCountered: 'Your suggestion is on its way. You’ll get a confirmation.',
+    },
+    cancel: {
+      eyebrow: 'Your spot',
+      title: 'Cancel your spot?',
+      body: 'Your spot will go to the next person on the waiting list, if there is one.',
+      confirm: 'Confirm cancellation',
+      cancelling: 'Cancelling…',
+      done: 'Your spot is cancelled. Thanks for letting us know.',
+      error: 'This link is no longer valid, or your spot was already cancelled.',
+      invalidLink: 'Invalid link.',
+    },
+    expired: {
+      eyebrow: 'Link expired',
+      title: 'This link has expired',
+      body: 'Invitations have a limited lifetime: past that point, their content is no longer viewable. Ask the person who sent it to generate a new one.',
+    },
+  },
+
+  proposalForm: {
+    sectionWho: 'Who it’s for',
+    sectionWhoHint: 'The recipient and the kind of occasion.',
+    sectionContent: 'The content',
+    sectionContentHint: 'What the person will see when they open the letter.',
+    sectionWhereWhen: 'Where and when',
+    sectionWhereWhenHint: 'The choices you leave to the person.',
+    sectionLook: 'The look',
+    sectionLookHint: 'The visual theme and how long the link stays live.',
+
+    audienceLabel: 'Who can come',
+    audienceOne: 'One person',
+    audienceOneHint: 'The classic journey',
+    audienceGroup: 'A group',
+    audienceGroupHint: 'Capacity to set',
+    audienceGroupLocked: '🔒 A group',
+    audienceGroupLockedHint: 'Premium Gold only',
+
+    nameLabel: 'Their first name',
+    nameLabelGroup: 'Name of the group or occasion',
+    namePlaceholder: 'Camille',
+    namePlaceholderGroup: 'Design team afterwork',
+
+    occasionLabel: 'The occasion',
+
+    capacityLabel: 'Number of spots',
+    capacityHint: (min: number, max: number) =>
+      `From ${min} to ${max}. Beyond that, people join a waiting list and are notified automatically if a spot frees up.`,
+
+    messageLabel: 'Your message',
+    messageHint: 'It will appear on the letter, in serif type.',
+    messagePlaceholder: 'I thought we could…',
+    messageSuggestionsAria: 'Suggested messages',
+
+    photoLabel: 'A photo',
+
+    locationsLabel: 'The places',
+    locationsLabelHidden: 'The places (hidden from the recipient)',
+    locationsHint: (max: number) => `From 1 to ${max} options.`,
+    locationsHintHidden: 'Surprise occasion: the place stays hidden until they accept.',
+    addLocation: '+ Add a place',
+
+    slotsLabel: 'The time slots',
+    slotsHint: (max: number) => `From 1 to ${max} options.`,
+    slotNumber: (index: number) => `Slot ${index}`,
+    removeSlot: 'Remove',
+    startTimeAria: 'Start time',
+    endTimeAria: 'End time',
+    addSlot: '+ Add a slot',
+
+    themeLabel: 'The visual theme',
+
+    expiryLabel: 'How long the link stays live',
+    expiryHint: 'GDPR: past that point, the link is no longer viewable.',
+    expiryDays: (days: number) => `${days} days`,
+
+    submit: 'Generate the link',
+    submitting: 'Creating…',
+
+    errorNoLocation: 'Suggest at least one place.',
+    errorSlotOrder: 'Each slot must end after it starts.',
+    errorNoSlot: 'Suggest at least one complete slot (date, start and end).',
+    errorCreate: 'Could not create.',
+
+    doneTitle: 'Your link is ready',
+    doneBodyGroup: (capacity: number) =>
+      `Share it with the group: ${capacity} spots, and you’ll get an email for every reply.`,
+    doneBody: (name: string) => `Send it to ${name}. You’ll get an email as soon as they reply.`,
+    doneBodyFallback: 'the person',
+    donePreview: 'Preview',
+    doneFinish: 'Done',
+  },
+
+  authForm: {
+    eyebrow: 'Creator space',
+    title: 'Welcome back',
+    subtitle: 'Enter your email: you’ll get a sign-in link, no password needed.',
+    emailLabel: 'Your email',
+    emailPlaceholder: 'you@example.com',
+    submit: 'Send my link',
+    submitting: 'Sending…',
+    privacyNote: 'Your email is only used to sign you in and notify you of replies.',
+    sentTitle: 'Check your inbox',
+    sentBody: (email: string) =>
+      `A sign-in link is on its way to ${email}. It stays valid for one hour.`,
+    sentRetry: 'Use another address',
+    sendError: 'Could not send. Check the address and try again.',
+    backHome: 'Back to home',
+    privacyLink: 'Privacy',
+  },
+
+  appPages: {
+    newEyebrow: 'New invitation',
+    newTitle: 'Create an invitation',
+    newSubtitle:
+      'You’ll get a unique link to send. The person will pick the place and the time slot from your options.',
+    newBack: '← My invitations',
+    newQuotaReached: 'You can create again next month, or as soon as you change plan.',
+  },
+
+  quotaBadge: {
+    count: (used: number, max: number) => `${used} / ${max} invitations this month`,
+    planLine: (plan: string, date: string) => `${plan} plan · resets on ${date}`,
+    progressAria: 'Invitations created this month',
+    reached: 'Limit reached. The invitations you already sent keep working normally.',
+    remaining: (left: number) =>
+      `Only ${left} invitation${left > 1 ? 's' : ''} left before the end of the month.`,
+    seePlans: 'See plans',
   },
 };
 

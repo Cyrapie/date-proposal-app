@@ -4,16 +4,25 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useState } from 'react';
 
 import { NoButton } from '@/components/recipient/NoButton';
-import { Heart } from '@/components/ui/Heart';
+import { StepHeader } from '@/components/recipient/StepHeader';
+import type { AnyProposalType } from '@/lib/domain/proposal';
+import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 export function DecisionScreen({
   recipientName,
+  type,
   onYes,
 }: {
   recipientName: string;
+  type: AnyProposalType;
   onYes: () => void;
 }) {
+  const t = useT();
+  const typeMeta = useTypeMeta();
+  const meta = typeMeta(type);
+
   const [tease, setTease] = useState<string | null>(null);
   const [teaseKey, setTeaseKey] = useState(0);
 
@@ -32,39 +41,12 @@ export function DecisionScreen({
       className="flex min-h-dvh flex-col items-center justify-center px-5 py-12"
     >
       <div className="w-full max-w-md text-center">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15, duration: 0.6 }}
-          className="text-xs uppercase tracking-[0.18em]"
-          style={{ color: 'var(--theme-muted)' }}
-        >
-          Pour toi, {recipientName}
-        </motion.p>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.6, ease: EASE_OUT_EXPO }}
-          className="mt-4 font-serif text-3xl leading-tight sm:text-4xl"
-          style={{ color: 'var(--theme-accent)' }}
-        >
-          Ça te dit un date avec moi ?
-        </motion.h1>
-
-        <motion.div
-          initial={{ scale: 0.7, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.4, type: 'spring', stiffness: 260, damping: 18 }}
-          className="mt-7 flex justify-center"
-        >
-          <motion.span
-            animate={{ scale: [1, 1.12, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Heart className="h-9 w-9" fill="var(--theme-accent)" />
-          </motion.span>
-        </motion.div>
+        <StepHeader
+          eyebrow={t.recipient.decision.eyebrow(recipientName)}
+          title={t.recipient.decision.title}
+          icon={meta.emoji}
+          delay={0.15}
+        />
 
         {/* Message de taquinerie : réservé en hauteur pour éviter tout saut. */}
         <div className="mt-8 flex h-7 items-center justify-center" aria-live="polite">
@@ -101,10 +83,15 @@ export function DecisionScreen({
               color: 'var(--theme-accent-ink)',
             }}
           >
-            Oui
+            {t.recipient.decision.yes}
           </button>
 
-          <NoButton onTease={handleTease} className="mt-2" />
+          <NoButton
+            label={t.recipient.decision.no}
+            messages={t.recipient.decision.tease}
+            onTease={handleTease}
+            className="mt-2"
+          />
         </motion.div>
       </div>
     </motion.div>

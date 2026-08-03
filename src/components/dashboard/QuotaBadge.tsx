@@ -1,10 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 
 import type { QuotaState } from '@/lib/data/quota';
-import { formatShortDate } from '@/lib/format';
+import { formatShortDateIn } from '@/lib/format';
+import { useLang } from '@/lib/i18n/language';
+import { useT } from '@/lib/i18n/use-t';
 
 /** Compteur d'invitations du mois, affiché au créateur. */
 export function QuotaBadge({ quota }: { quota: QuotaState }) {
+  const t = useT();
+  const lang = useLang();
   const pourcentage = Math.min(100, (quota.used / quota.plan.maxInvitations) * 100);
 
   return (
@@ -15,10 +21,10 @@ export function QuotaBadge({ quota }: { quota: QuotaState }) {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="text-sm font-semibold text-ink-900">
-          {quota.used} / {quota.plan.maxInvitations} invitations ce mois-ci
+          {t.quotaBadge.count(quota.used, quota.plan.maxInvitations)}
         </p>
         <p className="text-xs text-ink-400">
-          Formule {quota.plan.name} · remise à zéro le {formatShortDate(quota.resetsAt)}
+          {t.quotaBadge.planLine(quota.plan.name, formatShortDateIn(quota.resetsAt, lang))}
         </p>
       </div>
 
@@ -28,7 +34,7 @@ export function QuotaBadge({ quota }: { quota: QuotaState }) {
         aria-valuenow={quota.used}
         aria-valuemin={0}
         aria-valuemax={quota.plan.maxInvitations}
-        aria-label="Invitations créées ce mois-ci"
+        aria-label={t.quotaBadge.progressAria}
       >
         <div
           className={`h-full rounded-full transition-all ${
@@ -40,17 +46,16 @@ export function QuotaBadge({ quota }: { quota: QuotaState }) {
 
       {quota.reached ? (
         <p className="mt-3 text-sm leading-relaxed text-bordeaux-700">
-          Limite atteinte. Vos invitations déjà envoyées continuent de fonctionner normalement.{' '}
+          {t.quotaBadge.reached}{' '}
           <Link href="/tarifs" className="font-semibold underline underline-offset-4">
-            Voir les formules
+            {t.quotaBadge.seePlans}
           </Link>
         </p>
       ) : quota.remaining <= 2 ? (
         <p className="mt-3 text-xs leading-relaxed text-ink-400">
-          Plus que {quota.remaining} {quota.remaining > 1 ? 'invitations' : 'invitation'} avant la
-          fin du mois.{' '}
+          {t.quotaBadge.remaining(quota.remaining)}{' '}
           <Link href="/tarifs" className="underline underline-offset-4 hover:text-bordeaux-500">
-            Voir les formules
+            {t.quotaBadge.seePlans}
           </Link>
         </p>
       ) : null}

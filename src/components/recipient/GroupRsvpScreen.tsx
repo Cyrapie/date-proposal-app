@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion';
 
-import { Heart } from '@/components/ui/Heart';
+import { StepHeader } from '@/components/recipient/StepHeader';
 import type { PublicProposal } from '@/components/recipient/types';
+import type { AnyProposalType } from '@/lib/domain/proposal';
+import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 /**
@@ -14,13 +17,19 @@ import { EASE_OUT_EXPO } from '@/lib/motion';
  */
 export function GroupRsvpScreen({
   recipientName,
+  type,
   group,
   onJoin,
 }: {
   recipientName: string;
+  type: AnyProposalType;
   group: NonNullable<PublicProposal['group']>;
   onJoin: () => void;
 }) {
+  const t = useT();
+  const typeMeta = useTypeMeta();
+  const meta = typeMeta(type);
+
   const remaining = Math.max(0, group.capacity - group.confirmedCount);
   const full = remaining === 0;
 
@@ -34,43 +43,33 @@ export function GroupRsvpScreen({
       className="flex min-h-dvh flex-col items-center justify-center px-5 py-12"
     >
       <div className="w-full max-w-md text-center">
-        <p className="text-xs uppercase tracking-[0.18em]" style={{ color: 'var(--theme-muted)' }}>
-          {recipientName}
-        </p>
-
-        <motion.div
-          initial={{ scale: 0.7, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
-          className="mt-5 flex justify-center"
+        {/* Le nom du groupe tient lieu de surtitre : c'est lui qui identifie
+            l'invitation, avant même le titre générique. */}
+        <StepHeader
+          eyebrow={recipientName}
+          title={full ? t.recipient.group.titleFull : t.recipient.group.title}
+          icon={meta.emoji}
+          delay={0.1}
         >
-          <Heart className="h-9 w-9" fill="var(--theme-accent)" />
-        </motion.div>
-
-        <h1
-          className="mt-6 font-serif text-3xl leading-tight sm:text-4xl"
-          style={{ color: 'var(--theme-accent)' }}
-        >
-          {full ? "C'est complet — rejoignez la liste d'attente" : 'Vous êtes invité'}
-        </h1>
-
-        <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--theme-muted)' }}>
           {full
-            ? "Toutes les places sont prises, mais vous pouvez rejoindre la liste d'attente : vous serez prévenu automatiquement si une place se libère."
-            : `${remaining} place${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''} sur ${group.capacity}.`}
-        </p>
+            ? t.recipient.group.bodyFull
+            : t.recipient.group.remaining(remaining, group.capacity)}
+        </StepHeader>
 
-        <button
+        <motion.button
           type="button"
           onClick={onJoin}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.6 }}
           className="mt-8 w-full rounded-full px-8 py-4 text-lg font-medium shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition active:scale-[0.99]"
           style={{
             background: 'var(--theme-accent)',
             color: 'var(--theme-accent-ink)',
           }}
         >
-          {full ? "Rejoindre la liste d'attente" : 'Je participe'}
-        </button>
+          {full ? t.recipient.group.joinFull : t.recipient.group.join}
+        </motion.button>
       </div>
     </motion.div>
   );

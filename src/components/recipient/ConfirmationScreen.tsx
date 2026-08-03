@@ -2,13 +2,34 @@
 
 import { motion } from 'framer-motion';
 
-import { Heart } from '@/components/ui/Heart';
-import { formatSlotRange } from '@/lib/format';
+import { StepHeader } from '@/components/recipient/StepHeader';
 import type { ConfirmedResponse } from '@/components/recipient/types';
+import type { AnyProposalType } from '@/lib/domain/proposal';
+import { formatSlotRangeIn } from '@/lib/format';
+import { useLang } from '@/lib/i18n/language';
+import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
-export function ConfirmationScreen({ response }: { response: ConfirmedResponse }) {
+export function ConfirmationScreen({
+  response,
+  type,
+}: {
+  response: ConfirmedResponse;
+  type: AnyProposalType;
+}) {
+  const t = useT();
+  const lang = useLang();
+  const typeMeta = useTypeMeta();
+  const meta = typeMeta(type);
+
   const waitlisted = response.group?.status === 'waitlisted';
+
+  const title = waitlisted
+    ? t.recipient.confirmation.titleWaitlisted
+    : response.countered
+      ? t.recipient.confirmation.titleCountered
+      : t.recipient.confirmation.title;
 
   return (
     <motion.div
@@ -19,41 +40,11 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
       className="flex min-h-dvh flex-col items-center justify-center px-5 py-12"
     >
       <div className="w-full max-w-md">
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 240, damping: 16 }}
-          className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full"
-          style={{ background: 'var(--theme-accent)' }}
-        >
-          <Heart className="h-7 w-7" fill="var(--theme-accent-ink)" />
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.6 }}
-          className="text-center font-serif text-4xl leading-tight"
-          style={{ color: 'var(--theme-accent)' }}
-        >
-          {waitlisted ? "Vous êtes sur la liste" : response.countered ? 'Bien reçu' : 'Parfait'}
-        </motion.h1>
-
-        {waitlisted ? (
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="mt-3 text-center text-sm"
-            style={{ color: 'var(--theme-muted)' }}
-          >
-            Toutes les places sont prises pour l&apos;instant
-            {response.group?.waitlistPosition
-              ? ` — vous êtes en position ${response.group.waitlistPosition}`
-              : ''}
-            . Vous serez prévenu par email si une place se libère.
-          </motion.p>
-        ) : null}
+        <StepHeader eyebrow={t.recipient.confirmation.eyebrow} title={title} icon={meta.emoji} delay={0.1}>
+          {waitlisted
+            ? t.recipient.confirmation.waitlistBody(response.group?.waitlistPosition ?? null)
+            : null}
+        </StepHeader>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -68,10 +59,12 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
           <dl className="space-y-4 text-left">
             <div>
               <dt className="text-xs uppercase tracking-[0.14em]" style={{ color: 'var(--theme-muted)' }}>
-                {response.countered ? 'Votre proposition' : 'Quand'}
+                {response.countered
+                  ? t.recipient.confirmation.whenCountered
+                  : t.recipient.confirmation.when}
               </dt>
               <dd className="mt-1 font-serif text-lg">
-                {formatSlotRange(response.slot.start, response.slot.end)}
+                {formatSlotRangeIn(response.slot.start, response.slot.end, lang)}
               </dd>
             </div>
 
@@ -81,7 +74,7 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
                   className="text-xs uppercase tracking-[0.14em]"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  Où
+                  {t.recipient.confirmation.where}
                 </dt>
                 <dd className="mt-1 font-serif text-lg">
                   {response.location.label}
@@ -98,7 +91,7 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
                       className="mt-1 inline-block font-sans text-xs underline underline-offset-4"
                       style={{ color: 'var(--theme-accent)' }}
                     >
-                      Voir sur la carte
+                      {t.recipient.confirmation.mapLink}
                     </a>
                   ) : null}
                 </dd>
@@ -111,7 +104,7 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
                   className="text-xs uppercase tracking-[0.14em]"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  Ton mot
+                  {t.recipient.confirmation.yourNote}
                 </dt>
                 <dd className="mt-1 font-serif text-lg italic">« {response.note} »</dd>
               </div>
@@ -135,7 +128,7 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
                 color: 'var(--theme-accent-ink)',
               }}
             >
-              Ajouter à mon calendrier
+              {t.recipient.confirmation.addToCalendar}
             </a>
 
             <a
@@ -148,7 +141,7 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
                 color: 'var(--theme-muted)',
               }}
             >
-              Ouvrir dans Google Calendar
+              {t.recipient.confirmation.openGoogle}
             </a>
           </motion.div>
         )}
@@ -161,8 +154,8 @@ export function ConfirmationScreen({ response }: { response: ConfirmedResponse }
           style={{ color: 'var(--theme-muted)' }}
         >
           {response.countered
-            ? 'Votre proposition est transmise. Vous recevrez une confirmation.'
-            : "C'est envoyé. À très vite."}
+            ? t.recipient.confirmation.footerCountered
+            : t.recipient.confirmation.footer}
         </motion.p>
       </div>
     </motion.div>

@@ -22,9 +22,11 @@ export function Faq({ items }: { items: FaqItem[] }) {
       </h2>
 
       <div className="mt-10 space-y-3">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <details
             key={item.q}
+            data-reveal
+            style={{ '--reveal-delay': `${Math.min(index, 5) * 50}ms` } as React.CSSProperties}
             className="bloc group px-6 open:border-bordeaux-200 open:bg-bordeaux-50"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left font-medium text-ink-900 marker:content-none">

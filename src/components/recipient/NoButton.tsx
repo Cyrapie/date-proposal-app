@@ -3,21 +3,16 @@
 import { motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** Messages affichés à chaque tentative (parcourus cycliquement). */
-const TEASE_MESSAGES = [
-  'Essaie encore',
-  'Tu es sûr ?',
-  'Non non',
-  'Pas cette fois',
-  'Vraiment ?',
-] as const;
-
 /** Marge intérieure conservée entre le bouton et le bord de la zone de jeu. */
 const EDGE_PADDING = 8;
 
 type Offset = { x: number; y: number };
 
 type NoButtonProps = {
+  /** Libellé du bouton, traduit par l'appelant. */
+  label: string;
+  /** Messages affichés à chaque tentative, parcourus cycliquement. */
+  messages: readonly string[];
   /** Notifie l'écran parent pour afficher le message de taquinerie. */
   onTease: (message: string) => void;
   /** Notifie que le bouton est définitivement neutralisé. */
@@ -33,7 +28,7 @@ type NoButtonProps = {
  * Après 3 ou 4 tentatives (tirage aléatoire au montage), il passe en
  * `pointer-events: none` et continue de dériver seul pour l'effet comique.
  */
-export function NoButton({ onTease, onExhausted, className }: NoButtonProps) {
+export function NoButton({ label, messages, onTease, onExhausted, className }: NoButtonProps) {
   const fieldRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -99,7 +94,7 @@ export function NoButton({ onTease, onExhausted, className }: NoButtonProps) {
     if (exhaustedRef.current) return;
 
     attemptsRef.current += 1;
-    onTease(TEASE_MESSAGES[(attemptsRef.current - 1) % TEASE_MESSAGES.length]);
+    onTease(messages[(attemptsRef.current - 1) % messages.length]);
     move();
 
     if (attemptsRef.current >= maxAttemptsRef.current) {
@@ -107,7 +102,7 @@ export function NoButton({ onTease, onExhausted, className }: NoButtonProps) {
       exhaustedRef.current = true;
       setExhausted(true);
     }
-  }, [move, onTease]);
+  }, [messages, move, onTease]);
 
   // Une fois neutralisé, le bouton continue de dériver seul : il n'est plus
   // cliquable, donc plus rien ne peut relancer l'animation depuis l'extérieur.
@@ -168,7 +163,7 @@ export function NoButton({ onTease, onExhausted, className }: NoButtonProps) {
           rotate: { duration: 0.5 },
         }}
       >
-        Non
+        {label}
       </motion.button>
     </div>
   );

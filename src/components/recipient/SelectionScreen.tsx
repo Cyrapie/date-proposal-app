@@ -3,8 +3,12 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-import { formatSlotRange } from '@/lib/format';
+import { StepHeader } from '@/components/recipient/StepHeader';
 import type { PublicProposal } from '@/components/recipient/types';
+import { formatSlotRangeIn } from '@/lib/format';
+import { useLang } from '@/lib/i18n/language';
+import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 export type SelectionPayload = {
@@ -32,6 +36,11 @@ export function SelectionScreen({
   submitting: boolean;
   error: string | null;
 }) {
+  const t = useT();
+  const lang = useLang();
+  const typeMeta = useTypeMeta();
+  const meta = typeMeta(proposal.type);
+
   const offerLocations = !proposal.hideLocations && proposal.locations.length > 0;
 
   const [locationId, setLocationId] = useState<string | null>(
@@ -104,20 +113,11 @@ export function SelectionScreen({
           });
         }}
       >
-        <header className="text-center">
-          <p
-            className="text-xs uppercase tracking-[0.18em]"
-            style={{ color: 'var(--theme-muted)' }}
-          >
-            Presque fini
-          </p>
-          <h1
-            className="mt-3 font-serif text-3xl leading-tight"
-            style={{ color: 'var(--theme-accent)' }}
-          >
-            À toi de choisir
-          </h1>
-        </header>
+        <StepHeader
+          eyebrow={t.recipient.selection.eyebrow}
+          title={t.recipient.selection.title}
+          icon={meta.emoji}
+        />
 
         {isGroup ? (
           <div className="space-y-2">
@@ -126,7 +126,7 @@ export function SelectionScreen({
               className="block text-sm font-medium"
               style={{ color: 'var(--theme-muted)' }}
             >
-              Ton prénom
+              {t.recipient.selection.nameLabel}
             </label>
             <input
               id="participant-name"
@@ -134,7 +134,7 @@ export function SelectionScreen({
               onChange={(event) => setParticipantName(event.target.value)}
               required
               maxLength={60}
-              placeholder="Pour qu'on te reconnaisse dans la liste"
+              placeholder={t.recipient.selection.namePlaceholder}
               className="w-full rounded-2xl border p-4 text-base outline-none transition focus:ring-2"
               style={{
                 background: 'var(--theme-surface)',
@@ -148,7 +148,7 @@ export function SelectionScreen({
         {offerLocations ? (
           <fieldset className="space-y-3">
             <legend className="text-sm font-medium" style={{ color: 'var(--theme-muted)' }}>
-              Le lieu
+              {t.recipient.selection.locationLegend}
             </legend>
             {proposal.locations.map((location) => {
               const selected = location.id === locationId;
@@ -182,7 +182,7 @@ export function SelectionScreen({
                         className="mt-1 inline-block text-xs underline underline-offset-4"
                         style={{ color: 'var(--theme-accent)' }}
                       >
-                        Voir sur la carte
+                        {t.recipient.selection.mapLink}
                       </a>
                     ) : null}
                   </span>
@@ -195,13 +195,13 @@ export function SelectionScreen({
             className="rounded-2xl border border-dashed p-4 text-center text-sm"
             style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-muted)' }}
           >
-            Le lieu reste une surprise 🤫
+            {t.recipient.selection.hiddenLocation}
           </p>
         )}
 
         <fieldset className="space-y-3">
           <legend className="text-sm font-medium" style={{ color: 'var(--theme-muted)' }}>
-            Le créneau
+            {t.recipient.selection.slotLegend}
           </legend>
           {proposal.slots.map((slot) => {
             const selected = slot.id === slotId;
@@ -220,7 +220,7 @@ export function SelectionScreen({
                   className="h-4 w-4 shrink-0 accent-[var(--theme-accent)]"
                   required
                 />
-                <span className="font-medium">{formatSlotRange(slot.start, slot.end)}</span>
+                <span className="font-medium">{formatSlotRangeIn(slot.start, slot.end, lang)}</span>
               </label>
             );
           })}
@@ -240,7 +240,7 @@ export function SelectionScreen({
                 onChange={(event) => setAutreDate(event.target.checked)}
                 className="h-4 w-4 shrink-0 accent-[var(--theme-accent)]"
               />
-              <span className="font-medium">Aucun ne me va, je propose autre chose</span>
+              <span className="font-medium">{t.recipient.selection.counterToggle}</span>
             </label>
           )}
 
@@ -253,8 +253,7 @@ export function SelectionScreen({
               }}
             >
               <p className="text-sm" style={{ color: 'var(--theme-muted)' }}>
-                Proposez votre créneau. La personne qui vous a invité recevra votre proposition
-                et pourra la confirmer.
+                {t.recipient.selection.counterIntro}
               </p>
 
               <div className="space-y-2">
@@ -263,7 +262,7 @@ export function SelectionScreen({
                   className="block text-sm font-medium"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  Le jour
+                  {t.recipient.selection.counterDayLabel}
                 </label>
                 <input
                   id="jour-propose"
@@ -285,7 +284,7 @@ export function SelectionScreen({
                   type="time"
                   value={debut}
                   onChange={(event) => setDebut(event.target.value)}
-                  aria-label="Heure de début proposée"
+                  aria-label={t.recipient.selection.counterStartAria}
                   className="w-full rounded-xl border p-3 text-base outline-none"
                   style={{
                     background: 'var(--theme-bg)',
@@ -297,7 +296,7 @@ export function SelectionScreen({
                   type="time"
                   value={fin}
                   onChange={(event) => setFin(event.target.value)}
-                  aria-label="Heure de fin proposée"
+                  aria-label={t.recipient.selection.counterEndAria}
                   className="w-full rounded-xl border p-3 text-base outline-none"
                   style={{
                     background: 'var(--theme-bg)',
@@ -311,7 +310,7 @@ export function SelectionScreen({
                 value={lieuPropose}
                 onChange={(event) => setLieuPropose(event.target.value)}
                 maxLength={300}
-                placeholder="Un lieu, si vous en avez un en tête (facultatif)"
+                placeholder={t.recipient.selection.counterLocationPlaceholder}
                 className="w-full rounded-xl border p-3 text-base outline-none"
                 style={{
                   background: 'var(--theme-bg)',
@@ -329,7 +328,8 @@ export function SelectionScreen({
             className="block text-sm font-medium"
             style={{ color: 'var(--theme-muted)' }}
           >
-            Un mot pour moi <span className="font-normal">(facultatif)</span>
+            {t.recipient.selection.noteLabel}{' '}
+            <span className="font-normal">({t.common.optional})</span>
           </label>
           <textarea
             id="note"
@@ -338,7 +338,7 @@ export function SelectionScreen({
             maxLength={1000}
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Hâte d'y être…"
+            placeholder={t.recipient.selection.notePlaceholder}
             className="w-full resize-none rounded-2xl border p-4 text-base outline-none transition focus:ring-2"
             style={{
               background: 'var(--theme-surface)',
@@ -354,7 +354,8 @@ export function SelectionScreen({
             className="block text-sm font-medium"
             style={{ color: 'var(--theme-muted)' }}
           >
-            Ton email <span className="font-normal">(facultatif)</span>
+            {t.recipient.selection.emailLabel}{' '}
+            <span className="font-normal">({t.common.optional})</span>
           </label>
           <input
             id="recipient-email"
@@ -364,7 +365,7 @@ export function SelectionScreen({
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="pour recevoir ta confirmation + l'invitation agenda"
+            placeholder={t.recipient.selection.emailPlaceholder}
             className="w-full rounded-2xl border p-4 text-base outline-none transition focus:ring-2"
             style={{
               background: 'var(--theme-surface)',
@@ -373,7 +374,7 @@ export function SelectionScreen({
             }}
           />
           <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-muted)' }}>
-            Utilisé uniquement pour t&apos;envoyer cette confirmation. Rien d&apos;autre.
+            {t.recipient.selection.emailHint}
           </p>
         </div>
 
@@ -401,10 +402,10 @@ export function SelectionScreen({
           }}
         >
           {submitting
-            ? 'On envoie…'
+            ? t.recipient.selection.submitting
             : autreDate
-              ? 'Proposer cette date'
-              : "C'est validé"}
+              ? t.recipient.selection.submitCounter
+              : t.recipient.selection.submit}
         </button>
       </form>
     </motion.div>

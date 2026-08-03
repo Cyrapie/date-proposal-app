@@ -3,11 +3,13 @@
 import { useState, type FormEvent } from 'react';
 
 import { Field, inputClass } from '@/components/ui/Field';
+import { useT } from '@/lib/i18n/use-t';
 import { createClient } from '@/lib/supabase/client';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
 export function LoginForm({ nextPath }: { nextPath?: string }) {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -33,31 +35,21 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
       setStatus('sent');
     } catch (caught) {
       setStatus('error');
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Envoi impossible. Vérifiez l'adresse et réessayez.",
-      );
+      setError(caught instanceof Error ? caught.message : t.authForm.sendError);
     }
   }
 
   if (status === 'sent') {
     return (
-      <div
-        role="status"
-        className="bloc p-6 text-center"
-      >
-        <p className="font-serif text-xl font-bold text-ink-900">Regardez vos emails</p>
-        <p className="mt-2 text-sm leading-relaxed text-ink-400">
-          Un lien de connexion vient de partir vers{' '}
-          <span className="font-medium text-ink-600">{email}</span>. Il est valable une heure.
-        </p>
+      <div role="status" className="bloc p-6 text-center">
+        <p className="font-serif text-xl font-bold text-ink-900">{t.authForm.sentTitle}</p>
+        <p className="mt-2 text-sm leading-relaxed text-ink-400">{t.authForm.sentBody(email)}</p>
         <button
           type="button"
           onClick={() => setStatus('idle')}
           className="mt-4 text-xs text-ink-400 underline underline-offset-4 hover:text-ink-600"
         >
-          Utiliser une autre adresse
+          {t.authForm.sentRetry}
         </button>
       </div>
     );
@@ -65,7 +57,7 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Field label="Votre email" htmlFor="email" required error={error ?? undefined}>
+      <Field label={t.authForm.emailLabel} htmlFor="email" required error={error ?? undefined}>
         <input
           id="email"
           name="email"
@@ -75,7 +67,7 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="vous@exemple.fr"
+          placeholder={t.authForm.emailPlaceholder}
           className={inputClass}
         />
       </Field>
@@ -85,12 +77,10 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
         disabled={status === 'sending' || email.trim().length === 0}
         className="w-full rounded-full bg-accent px-6 py-3.5 text-base font-medium text-accent-ink transition active:scale-[0.99] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {status === 'sending' ? 'Envoi…' : 'Recevoir mon lien'}
+        {status === 'sending' ? t.authForm.submitting : t.authForm.submit}
       </button>
 
-      <p className="text-center text-xs leading-relaxed text-ink-400">
-        Votre email sert uniquement à vous connecter et à vous notifier des réponses.
-      </p>
+      <p className="text-center text-xs leading-relaxed text-ink-400">{t.authForm.privacyNote}</p>
     </form>
   );
 }

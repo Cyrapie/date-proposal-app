@@ -88,7 +88,12 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
 
           <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {t.home.steps.map((step, index) => (
-              <li key={step.title} className="bloc bloc-plein p-7">
+              <li
+                key={step.title}
+                data-reveal
+                style={{ '--reveal-delay': `${index * 80}ms` } as React.CSSProperties}
+                className="bloc bloc-plein p-7"
+              >
                 <span data-fixe className="pastille flex h-10 w-10 items-center justify-center rounded-2xl bg-accent font-serif text-lg text-accent-ink">
                   {index + 1}
                 </span>
@@ -108,7 +113,10 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
 
       {/* ------------------------------------------------------ Appel à l'action */}
       <section className="mx-auto w-full max-w-6xl px-5 pb-4">
-        <div className="gradient-bordeaux rounded-[var(--radius-vitrine)] px-8 py-16 text-center sm:px-16">
+        <div
+          data-reveal
+          className="gradient-bordeaux rounded-[var(--radius-vitrine)] px-8 py-16 text-center sm:px-16"
+        >
           <Heart className="mx-auto h-9 w-9 text-accent-ink" />
           <h2 className="mt-6 font-serif text-4xl leading-tight text-accent-ink sm:text-5xl">
             {t.home.ctaTitle1}

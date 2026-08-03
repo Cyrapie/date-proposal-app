@@ -23,7 +23,7 @@ export function AboutPageContent() {
           ))}
         </div>
 
-        <section className="mt-16">
+        <section data-reveal className="mt-16">
           <h2 className="font-serif text-3xl font-black text-ink-900">{t.aboutPage.principlesTitle}</h2>
           <dl className="mt-8 space-y-8">
             {t.aboutPage.principles.map((principle) => (
@@ -38,7 +38,10 @@ export function AboutPageContent() {
           </dl>
         </section>
 
-        <section className="mt-16 rounded-[var(--radius-vitrine)] border border-cream-300 bg-cream-50 p-8">
+        <section
+          data-reveal
+          className="mt-16 rounded-[var(--radius-vitrine)] border border-cream-300 bg-cream-50 p-8"
+        >
           <h2 className="font-serif text-2xl font-extrabold text-ink-900">{t.aboutPage.dataTitle}</h2>
           <p className="mt-3 text-base leading-relaxed text-ink-600">
             {t.aboutPage.dataBodyBefore}{' '}

@@ -11,6 +11,7 @@ import { LetterScreen } from '@/components/recipient/LetterScreen';
 import { SelectionScreen, type SelectionPayload } from '@/components/recipient/SelectionScreen';
 import type { ConfirmedResponse, PublicProposal } from '@/components/recipient/types';
 import { themeStyle } from '@/lib/domain/themes';
+import { useT } from '@/lib/i18n/use-t';
 
 type Step = 'envelope' | 'letter' | 'decision' | 'group-rsvp' | 'selection' | 'confirmation';
 
@@ -25,6 +26,7 @@ export function RecipientExperience({
   /** Aperçu de développement : aucun appel réseau, réponse simulée. */
   demo?: boolean;
 }) {
+  const t = useT();
   const [step, setStep] = useState<Step>(initialResponse ? 'confirmation' : 'envelope');
   const [response, setResponse] = useState<ConfirmedResponse | null>(initialResponse);
   const [submitting, setSubmitting] = useState(false);
@@ -82,13 +84,13 @@ export function RecipientExperience({
       const body = await res.json();
 
       if (!res.ok) {
-        throw new Error(body?.error ?? 'Enregistrement impossible. Réessayez.');
+        throw new Error(body?.error ?? t.recipient.selection.saveError);
       }
 
       setResponse(body.response as ConfirmedResponse);
       setStep('confirmation');
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Une erreur est survenue.');
+      setError(caught instanceof Error ? caught.message : t.recipient.selection.genericError);
     } finally {
       setSubmitting(false);
     }
@@ -98,7 +100,12 @@ export function RecipientExperience({
     <main className="themed min-h-dvh" style={themeStyle(proposal.theme)}>
       <AnimatePresence mode="wait">
         {step === 'envelope' ? (
-          <EnvelopeScreen key="envelope" onOpen={() => setStep('letter')} />
+          <EnvelopeScreen
+            key="envelope"
+            recipientName={proposal.recipientName}
+            type={proposal.type}
+            onOpen={() => setStep('letter')}
+          />
         ) : null}
 
         {step === 'letter' ? (
@@ -113,6 +120,7 @@ export function RecipientExperience({
           <DecisionScreen
             key="decision"
             recipientName={proposal.recipientName}
+            type={proposal.type}
             onYes={() => setStep('selection')}
           />
         ) : null}
@@ -121,6 +129,7 @@ export function RecipientExperience({
           <GroupRsvpScreen
             key="group-rsvp"
             recipientName={proposal.recipientName}
+            type={proposal.type}
             group={proposal.group}
             onJoin={() => setStep('selection')}
           />
@@ -137,7 +146,7 @@ export function RecipientExperience({
         ) : null}
 
         {step === 'confirmation' && response ? (
-          <ConfirmationScreen key="confirmation" response={response} />
+          <ConfirmationScreen key="confirmation" response={response} type={proposal.type} />
         ) : null}
       </AnimatePresence>
     </main>

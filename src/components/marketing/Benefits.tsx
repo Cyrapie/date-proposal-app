@@ -20,8 +20,13 @@ export function Benefits() {
       </div>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {t.benefits.items.map((benefit) => (
-          <article key={benefit.title} className="bloc bloc-plein p-7">
+        {t.benefits.items.map((benefit, index) => (
+          <article
+            key={benefit.title}
+            data-reveal
+            style={{ '--reveal-delay': `${Math.min(index, 4) * 70}ms` } as React.CSSProperties}
+            className="bloc bloc-plein p-7"
+          >
             <span
               aria-hidden="true"
               data-fixe

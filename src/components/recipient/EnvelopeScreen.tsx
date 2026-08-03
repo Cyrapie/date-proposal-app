@@ -2,10 +2,25 @@
 
 import { motion } from 'framer-motion';
 
-import { Heart } from '@/components/ui/Heart';
+import { StepHeader } from '@/components/recipient/StepHeader';
+import type { AnyProposalType } from '@/lib/domain/proposal';
+import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
-export function EnvelopeScreen({ onOpen }: { onOpen: () => void }) {
+export function EnvelopeScreen({
+  recipientName,
+  type,
+  onOpen,
+}: {
+  recipientName: string;
+  type: AnyProposalType;
+  onOpen: () => void;
+}) {
+  const t = useT();
+  const typeMeta = useTypeMeta();
+  const meta = typeMeta(type);
+
   return (
     <motion.div
       key="envelope"
@@ -15,14 +30,18 @@ export function EnvelopeScreen({ onOpen }: { onOpen: () => void }) {
       transition={{ duration: 0.5 }}
       className="flex min-h-dvh flex-col items-center justify-center px-6 py-12"
     >
+      <div className="w-full max-w-md">
+        <StepHeader eyebrow={t.recipient.envelope.eyebrow(recipientName)} title={t.recipient.envelope.title} />
+      </div>
+
       <motion.button
         type="button"
         onClick={onOpen}
-        aria-label="Ouvrir la lettre"
-        className="group relative outline-none"
+        aria-label={t.recipient.envelope.openAria}
+        className="group relative mt-10 outline-none"
         initial={{ y: 12, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15, duration: 0.6, ease: EASE_OUT_EXPO }}
+        transition={{ delay: 0.35, duration: 0.6, ease: EASE_OUT_EXPO }}
         whileTap={{ scale: 0.96 }}
       >
         {/* Respiration douce pour inviter au tap */}
@@ -64,14 +83,16 @@ export function EnvelopeScreen({ onOpen }: { onOpen: () => void }) {
             />
           </svg>
 
-          {/* Sceau en cœur */}
+          {/* Sceau : porte l'emoji de l'occasion plutôt qu'un cœur générique,
+              qui ne conviendrait ni à un afterwork ni à une sortie de club. */}
           <motion.div
-            className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full shadow-lg"
+            className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-2xl shadow-lg"
             style={{ background: 'var(--theme-accent)' }}
             animate={{ scale: [1, 1.08, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            aria-hidden="true"
           >
-            <Heart className="h-6 w-6" fill="var(--theme-accent-ink)" />
+            {meta.emoji}
           </motion.div>
         </motion.div>
       </motion.button>
@@ -79,11 +100,11 @@ export function EnvelopeScreen({ onOpen }: { onOpen: () => void }) {
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.9, duration: 0.8 }}
+        transition={{ delay: 1.1, duration: 0.8 }}
         className="mt-10 font-serif text-xl tracking-wide"
         style={{ color: 'var(--theme-muted)' }}
       >
-        Touche la lettre
+        {t.recipient.envelope.hint}
       </motion.p>
     </motion.div>
   );

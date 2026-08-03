@@ -17,8 +17,13 @@ export function PartnersPageContent() {
         <section className="mt-14">
           <h2 className="font-serif text-2xl font-extrabold text-ink-900">{t.partnersPage.whoForTitle}</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {t.partnersPage.profiles.map((profile) => (
-              <div key={profile.title} className="bloc bloc-plein p-6">
+            {t.partnersPage.profiles.map((profile, index) => (
+              <div
+                key={profile.title}
+                data-reveal
+                style={{ '--reveal-delay': `${index * 70}ms` } as React.CSSProperties}
+                className="bloc bloc-plein p-6"
+              >
                 <h3 className="font-serif text-xl font-bold text-ink-900">{profile.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-400">{profile.body}</p>
               </div>
@@ -27,7 +32,7 @@ export function PartnersPageContent() {
         </section>
 
         <div className="mt-16 grid gap-14 lg:grid-cols-[380px_minmax(0,1fr)]">
-          <section>
+          <section data-reveal>
             <h2 className="font-serif text-2xl font-extrabold text-ink-900">{t.partnersPage.howTitle}</h2>
             <ol className="mt-6 space-y-5">
               {t.partnersPage.steps.map((step, index) => (
@@ -45,7 +50,7 @@ export function PartnersPageContent() {
             </p>
           </section>
 
-          <section className="max-w-xl">
+          <section data-reveal className="max-w-xl">
             <h2 className="font-serif text-2xl font-extrabold text-ink-900">{t.partnersPage.letsTalkTitle}</h2>
             <p className="mt-2 mb-6 text-sm leading-relaxed text-ink-400">{t.partnersPage.letsTalkIntro}</p>
             <InquiryForm

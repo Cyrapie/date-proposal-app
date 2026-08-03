@@ -25,8 +25,12 @@ export function BlogListView({ posts }: { posts: Post[] }) {
           </p>
         ) : (
           <ul className="space-y-4">
-            {posts.map((post) => (
-              <li key={post.slug}>
+            {posts.map((post, index) => (
+              <li
+                key={post.slug}
+                data-reveal
+                style={{ '--reveal-delay': `${Math.min(index, 5) * 60}ms` } as React.CSSProperties}
+              >
                 <Link
                   href={`/blog/${post.slug}`}
                   className="block rounded-[var(--radius-vitrine)] border border-cream-300 bg-cream-50 p-7 transition hover:border-bordeaux-500"

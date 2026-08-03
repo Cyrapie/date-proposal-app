@@ -63,12 +63,14 @@ export function PricingTable({ devise }: { devise: CurrencyPreference }) {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-5 px-5 lg:grid-cols-3">
-      {PLAN_TIERS.map((tier) => {
+      {PLAN_TIERS.map((tier, index) => {
         const copy = t.pricingTable.plans[tier.id];
 
         return (
           <article
             key={tier.id}
+            data-reveal
+            style={{ '--reveal-delay': `${index * 90}ms` } as React.CSSProperties}
             className={`bloc relative flex flex-col p-8 ${
               tier.highlighted ? 'ring-2 ring-bordeaux-500' : ''
             }`}
