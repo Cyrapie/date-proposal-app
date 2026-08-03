@@ -234,6 +234,26 @@ body {
   transform: translateY(0);
 }
 
+/* Carrousel d'occasions : défilement natif au doigt/souris/clavier, bords
+   estompés pour suggérer qu'il y a plus à voir, barre de défilement masquée
+   sans empêcher le scroll (contrairement à `.suggestion-scroller`, qui est
+   pilotée par une animation CSS et n'accepte pas d'interaction directe). */
+.occasion-scroll {
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+
+.occasion-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bloc:hover,
   .bloc-plein:hover .pastille {

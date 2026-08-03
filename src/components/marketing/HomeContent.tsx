@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 import { Benefits } from '@/components/marketing/Benefits';
 import { Faq } from '@/components/marketing/Faq';
 import { OccasionCarousel } from '@/components/marketing/OccasionCarousel';
-import { Heart } from '@/components/ui/Heart';
+import { Testimonials } from '@/components/marketing/Testimonials';
 import { useT } from '@/lib/i18n/use-t';
 import { CTA_HREF } from '@/lib/marketing/nav';
 
@@ -29,12 +29,7 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
         <div className="relative mx-auto w-full max-w-6xl px-5 pt-14 pb-8 sm:pt-20">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-cream-300 bg-cream-50 px-4 py-2 text-xs font-medium text-bordeaux-600">
-                <Heart className="h-3.5 w-3.5 text-bordeaux-500" />
-                {t.home.badge}
-              </span>
-
-              <h1 className="mt-6 font-serif text-[2.7rem] font-black leading-[1.04] text-ink-900 sm:text-6xl">
+              <h1 className="font-serif text-[2.7rem] font-black leading-[1.04] text-ink-900 sm:text-6xl">
                 {t.home.heroTitle1}
                 <br />
                 <span className="gradient-text">{t.home.heroTitle2}</span>
@@ -57,11 +52,25 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
                 </Link>
               </div>
 
-              <dl className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                {t.home.proof.map((item) => (
-                  <div key={item.label}>
-                    <dd className="font-serif text-2xl font-extrabold text-bordeaux-600">{item.value}</dd>
-                    <dt className="mt-1 text-xs leading-snug text-ink-400">{item.label}</dt>
+              {/* Trois colonnes centrées sur une seule ligne, séparées par un
+                  filet fin : chaque icône reste au-dessus de son chiffre au
+                  lieu de lui disputer la largeur, donc les trois tiennent
+                  même dans la colonne étroite du héros. */}
+              <dl className="mt-10 flex items-start justify-between gap-2 sm:justify-start sm:gap-10">
+                {t.home.proof.map((item, index) => (
+                  <div
+                    key={item.label}
+                    className={`flex-1 text-center sm:flex-none ${
+                      index > 0 ? 'border-l border-cream-300 pl-2 sm:pl-10' : ''
+                    }`}
+                  >
+                    <span aria-hidden="true" className="text-lg">
+                      {item.icon}
+                    </span>
+                    <dd className="mt-1 font-serif text-2xl font-extrabold text-bordeaux-600">
+                      {item.value}
+                    </dd>
+                    <dt className="mt-0.5 text-xs leading-snug text-ink-400">{item.label}</dt>
                   </div>
                 ))}
               </dl>
@@ -105,6 +114,9 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
         </div>
       </section>
 
+      {/* ----------------------------------------------------------- Témoignages */}
+      <Testimonials />
+
       {/* ------------------------------------------------------------- Articles */}
       {blogTeaser}
 
@@ -117,7 +129,9 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
           data-reveal
           className="gradient-bordeaux rounded-[var(--radius-vitrine)] px-8 py-16 text-center sm:px-16"
         >
-          <Heart className="mx-auto h-9 w-9 text-accent-ink" />
+          <span aria-hidden="true" className="text-4xl">
+            ✉️
+          </span>
           <h2 className="mt-6 font-serif text-4xl leading-tight text-accent-ink sm:text-5xl">
             {t.home.ctaTitle1}
             <br className="hidden sm:block" /> {t.home.ctaTitle2}

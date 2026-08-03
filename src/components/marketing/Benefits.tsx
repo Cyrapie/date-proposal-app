@@ -19,13 +19,16 @@ export function Benefits() {
         </h2>
       </div>
 
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* flex + justify-center plutôt qu'une grille à colonnes fixes : un
+          nombre de cartes non multiple de 3 (7 aujourd'hui) ne laisse pas une
+          rangée orpheline collée à gauche. */}
+      <div className="mt-12 flex flex-wrap justify-center gap-5">
         {t.benefits.items.map((benefit, index) => (
           <article
             key={benefit.title}
             data-reveal
             style={{ '--reveal-delay': `${Math.min(index, 4) * 70}ms` } as React.CSSProperties}
-            className="bloc bloc-plein p-7"
+            className="bloc bloc-plein w-full p-7 sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)]"
           >
             <span
               aria-hidden="true"

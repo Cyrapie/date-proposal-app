@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { CopyLinkButton } from '@/components/dashboard/CopyLinkButton';
 import { QuotaBadge } from '@/components/dashboard/QuotaBadge';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
-import { Heart } from '@/components/ui/Heart';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { anyTypeMeta } from '@/lib/domain/proposal';
 import { proposalUrl } from '@/lib/domain/slug';
@@ -70,7 +69,9 @@ export default async function DashboardPage() {
       <header className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Heart className="h-4 w-4 text-bordeaux-500" />
+            <span aria-hidden="true" className="text-sm">
+              ✉️
+            </span>
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-bordeaux-500">
               Mes invitations
             </span>

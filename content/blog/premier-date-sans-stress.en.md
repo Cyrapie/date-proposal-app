@@ -32,7 +32,7 @@ The temptation is to offer a wide range to maximise the odds. That's a
 mistake. Ten time slots make your schedule look empty, and worse, they
 force the other person to do the sorting.
 
-Two well-chosen slots — one on a weekday, one on the weekend — cover most
+Two well-chosen slots (one on a weekday, one on the weekend) cover most
 situations.
 
 ## The note matters more than anything else

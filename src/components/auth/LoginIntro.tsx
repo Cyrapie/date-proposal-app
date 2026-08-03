@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import { Heart } from '@/components/ui/Heart';
 import { AppPageHeader } from '@/components/ui/AppPageHeader';
+import { BrandIcon } from '@/components/ui/BrandLogo';
 import { useT } from '@/lib/i18n/use-t';
 
 export function LoginHeader() {
@@ -16,7 +16,9 @@ export function LoginHeader() {
       title={t.authForm.title}
       subtitle={t.authForm.subtitle}
     >
-      <Heart className="mx-auto mb-4 h-8 w-8 text-bordeaux-500" />
+      {/* L'icône officielle plutôt qu'un emoji clé : même mark que l'en-tête
+          et le pied de page, pas une approximation. */}
+      <BrandIcon size={40} className="mx-auto mb-4" />
     </AppPageHeader>
   );
 }

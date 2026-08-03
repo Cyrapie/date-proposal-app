@@ -1,4 +1,5 @@
 import { ConsoleNav } from '@/components/console/ConsoleNav';
+import { BrandIcon } from '@/components/ui/BrandLogo';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { requireConsoleAdmin } from '@/lib/console/guard';
 
@@ -21,9 +22,7 @@ export default async function ConsoleAuthedLayout({
       <header className="sticky top-0 z-40 border-b border-cream-300 bg-cream-100/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-5">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent font-serif text-sm font-black text-accent-ink">
-              O
-            </span>
+            <BrandIcon size={26} />
             <span className="font-serif text-lg leading-none text-ink-900">Console</span>
           </div>
 

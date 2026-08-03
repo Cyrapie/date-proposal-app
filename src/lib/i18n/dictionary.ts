@@ -27,12 +27,6 @@ const fr = {
 
   footer: {
     tagline: 'Proposez un rendez-vous en un lien. La personne choisit, et tout part dans vos agendas.',
-    siteHeading: 'Le site',
-    accountHeading: 'Votre compte',
-    legalHeading: 'Juridique',
-    login: 'Se connecter',
-    myInvitations: 'Mes invitations',
-    confidentiality: 'Confidentialité',
     legalNavLabel: 'Mentions légales',
     privacy: 'Politique de confidentialité',
     community: 'Règles de la communauté',
@@ -42,16 +36,15 @@ const fr = {
   },
 
   home: {
-    badge: 'Pour les invitations qui méritent mieux qu’un SMS',
     heroTitle1: 'Proposez un rendez-vous,',
     heroTitle2: 'joliment.',
     heroBody:
       'Une invitation animée, envoyée en un lien. La personne l’ouvre comme une lettre, choisit le lieu et le créneau qui lui vont, et tout part directement dans vos deux agendas.',
     ctaHow: 'Comment ça marche',
     proof: [
-      { label: 'Compte requis côté destinataire', value: 'Aucun' },
-      { label: 'Connexion à votre agenda', value: 'Jamais' },
-      { label: 'Durée de vie d’un lien', value: '7 à 90 j' },
+      { icon: '🔓', label: 'Compte requis côté destinataire', value: 'Aucun' },
+      { icon: '🔒', label: 'Connexion à votre agenda', value: 'Jamais' },
+      { icon: '⏳', label: 'Durée de vie d’un lien', value: '7 à 90 j' },
     ],
     stepsEyebrow: 'Comment ça fonctionne',
     stepsTitle: 'Quatre étapes, deux minutes',
@@ -84,8 +77,6 @@ const fr = {
     prev: 'Occasion précédente',
     next: 'Occasion suivante',
     chooseAria: 'Choisir une occasion',
-    slideAria: (i: number, total: number, label: string) => `${i} sur ${total}, ${label}`,
-    slideLive: (label: string, i: number, total: number) => `${label}, diapositive ${i} sur ${total}`,
     labels: {
       cinema: 'Cinéma',
       restaurant: 'Restaurant',
@@ -150,6 +141,38 @@ const fr = {
         title: 'Une vraie mise en scène',
         body: 'Une enveloppe scellée, une lettre, une photo. L’effet n’a rien à voir avec un message texte.',
       },
+      {
+        icon: '🎉',
+        title: 'Aussi pour un groupe',
+        body: 'Afterwork, sortie de club, entre collègues. Une capacité à définir, une liste d’attente qui se gère toute seule (formule Gold).',
+      },
+    ],
+  },
+
+  testimonials: {
+    eyebrow: 'Ils en parlent',
+    title1: 'Ce qu’ils en',
+    title2: 'disent',
+    chooseAria: 'Choisir un témoignage',
+    items: [
+      {
+        quote:
+          'J’ai reçu l’invitation comme une vraie lettre, pas un message de plus dans mes notifications. Ça change tout.',
+        name: 'Aïcha M.',
+        role: 'Destinataire, invitation restaurant',
+      },
+      {
+        quote:
+          'Fini le ping-pong de messages pour trouver une date. J’envoie un lien, elle choisit, c’est réglé en deux minutes.',
+        name: 'Karim D.',
+        role: 'Créateur, invitation weekend',
+      },
+      {
+        quote:
+          'On a organisé l’afterwork de l’équipe avec la liste d’attente automatique. Plus besoin de relancer tout le monde par message.',
+        name: 'Léa F.',
+        role: 'Organisatrice, afterwork d’équipe (12 places)',
+      },
     ],
   },
 
@@ -212,6 +235,10 @@ const fr = {
         q: 'Puis-je changer de formule ou arrêter ?',
         a: 'À tout moment, sans engagement de durée. En cas d’arrêt, vous repassez simplement sur la formule gratuite au terme du mois payé.',
       },
+      {
+        q: 'Puis-je inviter un groupe, pas juste une personne ?',
+        a: 'Oui, en formule Premium Gold : afterwork, sortie de club, entre collègues. Vous fixez une capacité, les places se prennent au fil des réponses, et une liste d’attente prend le relais automatiquement si elle est prise d’assaut.',
+      },
     ] satisfies Faq[],
   },
 
@@ -253,6 +280,7 @@ const fr = {
         features: [
           "Jusqu'à 50 invitations par mois",
           'Tout ce que contient Premium',
+          'Invitations de groupe, avec liste d’attente',
           'Suppression de la mention de bas de page',
           'Statistiques d’ouverture détaillées',
           'Accès anticipé aux nouveautés',
@@ -370,18 +398,22 @@ const fr = {
     principlesTitle: 'Ce à quoi nous tenons',
     principles: [
       {
+        icon: '🔓',
         title: 'Le destinataire ne s’inscrit jamais',
         body: 'Demander un compte à quelqu’un pour lui proposer un dîner, c’est déjà avoir perdu. Un lien, une page, un choix. Rien d’autre.',
       },
       {
+        icon: '🔒',
         title: 'Nous ne touchons pas à votre agenda',
         body: 'Aucune connexion Google, Outlook ou Apple. Nous produisons un fichier .ics et un lien pré-rempli. Vous décidez de ce qui entre dans votre calendrier.',
       },
       {
+        icon: '⏳',
         title: 'Les liens expirent',
         body: 'Une invitation n’a pas vocation à rester en ligne indéfiniment. Vous fixez sa durée de vie ; ensuite elle disparaît, pour de bon.',
       },
       {
+        icon: '🛡️',
         title: 'Le strict nécessaire',
         body: 'Nous stockons ce qu’il faut pour que l’invitation fonctionne. Pas de traceur, pas de revente, pas de profilage.',
       },
@@ -542,7 +574,7 @@ const fr = {
         id: 'contenu-invitations',
         title: 'Contenu des invitations',
         paragraphs: [
-          "Vous êtes seul responsable du contenu que vous publiez (message, photo, lieux, créneaux). Il doit rester licite et ne porter atteinte à aucun tiers — voir les règles de la communauté.",
+          "Vous êtes seul responsable du contenu que vous publiez (message, photo, lieux, créneaux). Il doit rester licite et ne porter atteinte à aucun tiers : voir les règles de la communauté.",
         ],
       },
       {
@@ -662,7 +694,7 @@ const fr = {
     group: {
       eyebrow: 'Invitation de groupe',
       title: 'Vous êtes invité',
-      titleFull: 'C’est complet — rejoignez la liste d’attente',
+      titleFull: 'C’est complet : rejoignez la liste d’attente',
       bodyFull:
         'Toutes les places sont prises, mais vous pouvez rejoindre la liste d’attente : vous serez prévenu automatiquement si une place se libère.',
       remaining: (left: number, capacity: number) =>
@@ -704,7 +736,7 @@ const fr = {
       titleWaitlisted: 'Vous êtes sur la liste',
       waitlistBody: (position: number | null) =>
         `Toutes les places sont prises pour l’instant${
-          position ? ` — vous êtes en position ${position}` : ''
+          position ? `, vous êtes en position ${position}` : ''
         }. Vous serez prévenu par email si une place se libère.`,
       when: 'Quand',
       whenCountered: 'Votre proposition',
@@ -867,12 +899,6 @@ const en: typeof fr = {
 
   footer: {
     tagline: 'Propose a date with a single link. They choose, and it lands straight in both your calendars.',
-    siteHeading: 'Site',
-    accountHeading: 'Your account',
-    legalHeading: 'Legal',
-    login: 'Log in',
-    myInvitations: 'My invitations',
-    confidentiality: 'Privacy',
     legalNavLabel: 'Legal',
     privacy: 'Privacy policy',
     community: 'Community guidelines',
@@ -882,16 +908,15 @@ const en: typeof fr = {
   },
 
   home: {
-    badge: 'For invitations that deserve better than a text message',
     heroTitle1: 'Propose a date,',
     heroTitle2: 'beautifully.',
     heroBody:
       'An animated invitation, sent as a single link. They open it like a letter, pick the place and time that suit them, and it lands straight in both your calendars.',
     ctaHow: 'How it works',
     proof: [
-      { label: 'Account required on their side', value: 'None' },
-      { label: 'Access to your calendar', value: 'Never' },
-      { label: 'How long a link stays valid', value: '7–90 days' },
+      { icon: '🔓', label: 'Account required on their side', value: 'None' },
+      { icon: '🔒', label: 'Access to your calendar', value: 'Never' },
+      { icon: '⏳', label: 'How long a link stays valid', value: '7–90 days' },
     ],
     stepsEyebrow: 'How it works',
     stepsTitle: 'Four steps, two minutes',
@@ -924,8 +949,6 @@ const en: typeof fr = {
     prev: 'Previous occasion',
     next: 'Next occasion',
     chooseAria: 'Choose an occasion',
-    slideAria: (i: number, total: number, label: string) => `${i} of ${total}, ${label}`,
-    slideLive: (label: string, i: number, total: number) => `${label}, slide ${i} of ${total}`,
     labels: {
       cinema: 'Cinema',
       restaurant: 'Restaurant',
@@ -945,7 +968,7 @@ const en: typeof fr = {
       just_because: 'Just because',
     },
     pitches: {
-      cinema: 'Two showings to choose from — they pick the time that suits them.',
+      cinema: 'Two showings to choose from, they pick the time that suits them.',
       restaurant: 'Three tables scouted, one link to send.',
       weekend: 'A getaway for two, with dates you can actually keep.',
       activity: 'Climbing, an exhibit, a pottery class. Propose it, let them decide.',
@@ -983,12 +1006,44 @@ const en: typeof fr = {
       {
         icon: '⏳',
         title: 'Links that expire',
-        body: 'From 7 to 90 days, your choice. After that, the content disappears — for good.',
+        body: 'From 7 to 90 days, your choice. After that, the content disappears for good.',
       },
       {
         icon: '💌',
         title: 'A real bit of staging',
         body: 'A sealed envelope, a letter, a photo. Nothing like a plain text message.',
+      },
+      {
+        icon: '🎉',
+        title: 'For groups too',
+        body: 'Afterworks, club nights, get-togethers with colleagues. Set a capacity, the waitlist manages itself (Gold plan).',
+      },
+    ],
+  },
+
+  testimonials: {
+    eyebrow: 'What people say',
+    title1: 'What people',
+    title2: 'actually say',
+    chooseAria: 'Choose a testimonial',
+    items: [
+      {
+        quote:
+          'The invitation felt like an actual letter, not one more notification. That changes everything.',
+        name: 'Aïcha M.',
+        role: 'Recipient, restaurant invitation',
+      },
+      {
+        quote:
+          'No more back-and-forth to find a date. I send a link, she picks, done in two minutes.',
+        name: 'Karim D.',
+        role: 'Creator, weekend invitation',
+      },
+      {
+        quote:
+          'We organised the team afterwork with the automatic waitlist. No more chasing everyone by message.',
+        name: 'Léa F.',
+        role: 'Organiser, team afterwork (12 spots)',
       },
     ],
   },
@@ -1042,7 +1097,7 @@ const en: typeof fr = {
       },
       {
         q: 'When does the counter reset?',
-        a: 'On the first of each month. It counts invitations created, not answers received — an invitation with no reply still counts.',
+        a: 'On the first of each month. It counts invitations created, not answers received: an invitation with no reply still counts.',
       },
       {
         q: 'Why prices in CFA francs?',
@@ -1051,6 +1106,10 @@ const en: typeof fr = {
       {
         q: 'Can I change plans or cancel?',
         a: 'Any time, no minimum commitment. If you cancel, you simply drop back to the free plan once the paid month ends.',
+      },
+      {
+        q: 'Can I invite a group, not just one person?',
+        a: 'Yes, on the Premium Gold plan: afterworks, club nights, get-togethers with colleagues. You set a capacity, spots fill up as people reply, and a waitlist takes over automatically once it’s full.',
       },
     ] satisfies Faq[],
   },
@@ -1150,7 +1209,7 @@ const en: typeof fr = {
       },
       {
         q: 'How quickly do you reply?',
-        a: 'Usually within two business days. If your message is about an invitation you already sent, say so — those go first.',
+        a: 'Usually within two business days. If your message is about an invitation you already sent, say so: those go first.',
       },
     ] satisfies Faq[],
   },
@@ -1210,18 +1269,22 @@ const en: typeof fr = {
     principlesTitle: 'What we care about',
     principles: [
       {
+        icon: '🔓',
         title: 'The recipient never signs up',
         body: 'Asking someone to create an account just to invite them to dinner is already a lost cause. A link, a page, a choice. Nothing else.',
       },
       {
+        icon: '🔒',
         title: 'We don’t touch your calendar',
         body: 'No connection to Google, Outlook or Apple. We produce an .ics file and a pre-filled link. You decide what goes into your calendar.',
       },
       {
+        icon: '⏳',
         title: 'Links expire',
         body: 'An invitation isn’t meant to stay online forever. You set its lifespan; after that it disappears, for good.',
       },
       {
+        icon: '🛡️',
         title: 'Only the strict minimum',
         body: 'We store what’s needed for the invitation to work. No tracker, no reselling, no profiling.',
       },
@@ -1269,7 +1332,7 @@ const en: typeof fr = {
         id: 'donnees-collectees',
         title: 'What we collect',
         paragraphs: [
-          'Creator: your email address (login and notifications), and the content of the invitations you compose — the recipient’s first name, occasion type, message, optional photo, proposed places and time slots, chosen theme.',
+          'Creator: your email address (login and notifications), and the content of the invitations you compose, meaning the recipient’s first name, occasion type, message, optional photo, proposed places and time slots, chosen theme.',
           'Recipient: no account, no profile. We only record the chosen place and time, the optional note left, the email address if voluntarily provided to receive confirmation, and the timestamp the link was opened.',
         ],
       },
@@ -1378,7 +1441,7 @@ const en: typeof fr = {
         id: 'contenu-invitations',
         title: 'Invitation content',
         paragraphs: [
-          'You are solely responsible for the content you publish (message, photo, places, time slots). It must remain lawful and must not infringe on any third party — see the community guidelines.',
+          'You are solely responsible for the content you publish (message, photo, places, time slots). It must remain lawful and must not infringe on any third party: see the community guidelines.',
         ],
       },
       {
@@ -1488,7 +1551,7 @@ const en: typeof fr = {
     group: {
       eyebrow: 'Group invitation',
       title: 'You’re invited',
-      titleFull: 'It’s full — join the waiting list',
+      titleFull: 'It’s full: join the waiting list',
       bodyFull:
         'Every spot is taken, but you can join the waiting list: you’ll be notified automatically if one frees up.',
       remaining: (left: number, capacity: number) =>
@@ -1530,7 +1593,7 @@ const en: typeof fr = {
       titleWaitlisted: 'You’re on the list',
       waitlistBody: (position: number | null) =>
         `Every spot is taken for now${
-          position ? ` — you’re number ${position}` : ''
+          position ? `, you’re number ${position}` : ''
         }. You’ll get an email if one frees up.`,
       when: 'When',
       whenCountered: 'Your suggestion',

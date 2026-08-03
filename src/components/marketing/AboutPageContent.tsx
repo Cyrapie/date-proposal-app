@@ -3,7 +3,6 @@
 import Link from 'next/link';
 
 import { PageHeader } from '@/components/marketing/PageHeader';
-import { Heart } from '@/components/ui/Heart';
 import { useT } from '@/lib/i18n/use-t';
 import { CTA_HREF } from '@/lib/marketing/nav';
 
@@ -29,7 +28,9 @@ export function AboutPageContent() {
             {t.aboutPage.principles.map((principle) => (
               <div key={principle.title}>
                 <dt className="flex items-start gap-3">
-                  <Heart className="mt-1 h-4 w-4 shrink-0 text-bordeaux-600" />
+                  <span aria-hidden="true" className="mt-0.5 shrink-0 text-lg">
+                    {principle.icon}
+                  </span>
                   <span className="font-serif text-xl font-bold text-ink-900">{principle.title}</span>
                 </dt>
                 <dd className="mt-2 pl-7 text-base leading-relaxed text-ink-600">{principle.body}</dd>

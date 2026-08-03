@@ -1,11 +1,9 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useT } from '@/lib/i18n/use-t';
 import { PROPOSAL_TYPES } from '@/lib/domain/proposal';
-import { EASE_OUT_EXPO } from '@/lib/motion';
 
 const EMOJI: Record<(typeof PROPOSAL_TYPES)[number], string> = {
   cinema: '🎬',
@@ -17,127 +15,160 @@ const EMOJI: Record<(typeof PROPOSAL_TYPES)[number], string> = {
   just_because: '💌',
 };
 
-const INTERVAL_MS = 5000;
+/** Largeur de carte + espacement (`w-[172px]` + `gap-3`) : sert au pas des flèches et au calcul du point actif. */
+const STEP = 172 + 12;
+const TOTAL = PROPOSAL_TYPES.length;
 
+/**
+ * Carrousel à défilement horizontal : toutes les occasions sont des cartes
+ * qu'on fait glisser, calées par carte grâce à `scroll-snap` plutôt qu'une
+ * logique d'index en JS pour le défilement lui-même.
+ *
+ * Les flèches et les points sont un raccourci au-dessus de ce même scroll —
+ * ils appellent `scrollTo`, ils ne remplacent pas de logique de pagination
+ * séparée. Le point actif suit la position réelle de défilement (utile
+ * quand on arrive ici en glissant à la main), pas un état qu'on maintient
+ * à côté et qui pourrait diverger.
+ */
 export function OccasionCarousel() {
   const t = useT();
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const touchStartX = useRef<number | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef<{ startX: number; startScroll: number; moved: boolean } | null>(null);
+  const [active, setActive] = useState(0);
 
-  const total = PROPOSAL_TYPES.length;
-  const go = useCallback((next: number) => setIndex(((next % total) + total) % total), [total]);
-
-  // Défilement automatique, suspendu au survol, au focus et si l'utilisateur
-  // a demandé moins d'animations.
   useEffect(() => {
-    if (paused) return;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const track = trackRef.current;
+    if (!track) return;
 
-    const timer = window.setInterval(() => setIndex((i) => (i + 1) % total), INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, [paused, total]);
+    // Calcul immédiat, pas de `requestAnimationFrame` : ce n'est pas une
+    // animation, juste une division, et rAF se met en pause quand l'onglet
+    // passe en arrière-plan — inutile d'y accrocher un état aussi simple.
+    const onScroll = () => setActive(Math.round(track.scrollLeft / STEP));
 
-  const type = PROPOSAL_TYPES[index];
-  const label = t.occasions.labels[type];
-  const headline = t.occasions.headlines[type];
-  const pitch = t.occasions.pitches[type];
+    track.addEventListener('scroll', onScroll, { passive: true });
+    return () => track.removeEventListener('scroll', onScroll);
+  }, []);
+
+  function goTo(index: number) {
+    const clamped = Math.max(0, Math.min(TOTAL - 1, index));
+    // Mis à jour tout de suite plutôt que d'attendre l'événement `scroll` du
+    // défilement fluide déclenché juste en dessous : un clic sait déjà vers
+    // quelle carte il va, pas besoin de laisser le point actif à la traîne
+    // le temps de l'animation.
+    setActive(clamped);
+    trackRef.current?.scrollTo({
+      left: clamped * STEP,
+      behavior: 'smooth',
+    });
+  }
+
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    // Le clic droit et le tactile (déjà géré nativement par le scroll du
+    // navigateur) n'ont pas besoin de ce glisser-déposer maison.
+    if (event.pointerType === 'touch' || event.button !== 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    dragState.current = { startX: event.clientX, startScroll: track.scrollLeft, moved: false };
+    track.setPointerCapture(event.pointerId);
+  }
+
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragState.current;
+    const track = trackRef.current;
+    if (!drag || !track) return;
+
+    const delta = event.clientX - drag.startX;
+    if (Math.abs(delta) > 3) drag.moved = true;
+    track.scrollLeft = drag.startScroll - delta;
+  }
+
+  function endDrag(event: React.PointerEvent<HTMLDivElement>) {
+    trackRef.current?.releasePointerCapture(event.pointerId);
+    dragState.current = null;
+  }
 
   return (
-    <section
-      aria-roledescription="carrousel"
-      aria-label={t.occasions.ariaLabel}
-      className="relative"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={() => setPaused(false)}
-      onTouchStart={(event) => {
-        touchStartX.current = event.touches[0].clientX;
-      }}
-      onTouchEnd={(event) => {
-        if (touchStartX.current === null) return;
-        const delta = event.changedTouches[0].clientX - touchStartX.current;
-        if (Math.abs(delta) > 45) go(index + (delta < 0 ? 1 : -1));
-        touchStartX.current = null;
-      }}
-    >
-      <div className="relative overflow-hidden rounded-[var(--radius-card)] border border-cream-300 bg-bordeaux-50">
-        {/* Hauteur réservée : évite que la page saute d'une slide à l'autre. */}
-        <div className="relative h-[340px] sm:h-[300px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={type}
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
-              transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
-              className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center"
-              role="group"
-              aria-roledescription="diapositive"
-              aria-label={t.occasions.slideAria(index + 1, total, label)}
-            >
-              <span className="text-5xl" aria-hidden="true">
-                {EMOJI[type]}
-              </span>
-              <p className="mt-5 text-xs uppercase tracking-[0.18em] text-ink-400">
-                {label}
-              </p>
-              <h3 className="mt-3 font-serif text-3xl leading-tight text-bordeaux-500 sm:text-4xl">
-                {headline}
-              </h3>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-ink-600">
-                {pitch}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        <div className="flex items-center justify-between border-t border-cream-300 px-4 py-3">
-          <button
-            type="button"
-            onClick={() => go(index - 1)}
-            aria-label={t.occasions.prev}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream-300 text-ink-600 transition hover:border-bordeaux-500 hover:text-bordeaux-500"
+    // `min-w-0` : sans lui, cet élément — enfant d'une grille — refuse de
+    // rétrécir sous la largeur de son contenu (les 7 cartes bout à bout),
+    // et pousse toute la grille en dehors du viewport au lieu de défiler.
+    <div className="min-w-0">
+      <div
+        ref={trackRef}
+        role="region"
+        aria-label={t.occasions.ariaLabel}
+        tabIndex={0}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        // Un clic qui a servi à glisser ne doit pas aussi activer la carte
+        // sous le pointeur (lien ou bouton, le cas échéant, à l'avenir).
+        onClickCapture={(event) => {
+          if (dragState.current?.moved) event.preventDefault();
+        }}
+        className="occasion-scroll flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [cursor:grab] active:[cursor:grabbing]"
+      >
+        {PROPOSAL_TYPES.map((type) => (
+          <article
+            key={type}
+            tabIndex={0}
+            className="group w-[172px] shrink-0 snap-start rounded-2xl border border-cream-300 bg-cream-50 p-5 text-center transition hover:-translate-y-0.5 hover:border-bordeaux-500 hover:bg-bordeaux-50 focus-visible:-translate-y-0.5 focus-visible:border-bordeaux-500 focus-visible:bg-bordeaux-50 focus-visible:outline-none active:translate-y-0 active:bg-bordeaux-50"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-
-          <div className="flex items-center gap-2" role="tablist" aria-label={t.occasions.chooseAria}>
-            {PROPOSAL_TYPES.map((option, i) => (
-              <button
-                key={option}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={t.occasions.labels[option]}
-                onClick={() => go(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === index ? 'w-6 bg-accent' : 'w-2 bg-cream-300 hover:bg-bordeaux-500'
-                }`}
-              />
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => go(index + 1)}
-            aria-label={t.occasions.next}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream-300 text-ink-600 transition hover:border-bordeaux-500 hover:text-bordeaux-500"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
+            <span aria-hidden="true" className="text-2xl">
+              {EMOJI[type]}
+            </span>
+            <h3 className="mt-3 font-serif text-lg font-bold leading-tight text-ink-900 transition group-hover:text-bordeaux-600">
+              {t.occasions.labels[type]}
+            </h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-ink-400">
+              {t.occasions.pitches[type]}
+            </p>
+          </article>
+        ))}
       </div>
 
-      {/* Annonce le changement de slide aux lecteurs d'écran. */}
-      <p className="sr-only" aria-live="polite">
-        {t.occasions.slideLive(label, index + 1, total)}
-      </p>
-    </section>
+      <div className="mt-3 flex items-center justify-center gap-4">
+        <button
+          type="button"
+          onClick={() => goTo(active - 1)}
+          disabled={active === 0}
+          aria-label={t.occasions.prev}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cream-300 text-ink-600 transition hover:border-bordeaux-500 hover:text-bordeaux-500 disabled:pointer-events-none disabled:opacity-30"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        <div className="flex items-center gap-2" role="tablist" aria-label={t.occasions.chooseAria}>
+          {PROPOSAL_TYPES.map((type, i) => (
+            <button
+              key={type}
+              type="button"
+              role="tab"
+              aria-selected={i === active}
+              aria-label={t.occasions.labels[type]}
+              onClick={() => goTo(i)}
+              className={`h-2 rounded-full transition-all ${
+                i === active ? 'w-6 bg-accent' : 'w-2 bg-cream-300 hover:bg-bordeaux-300'
+              }`}
+            />
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => goTo(active + 1)}
+          disabled={active === TOTAL - 1}
+          aria-label={t.occasions.next}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cream-300 text-ink-600 transition hover:border-bordeaux-500 hover:text-bordeaux-500 disabled:pointer-events-none disabled:opacity-30"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
 }

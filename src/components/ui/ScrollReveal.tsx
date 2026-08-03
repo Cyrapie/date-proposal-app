@@ -15,6 +15,10 @@ import { useEffect } from 'react';
  * JavaScript, ou si ce composant ne monte pas, le contenu reste simplement
  * visible plutôt que de disparaître définitivement.
  *
+ * Se rejoue à chaque passage : la classe suit l'intersection dans les deux
+ * sens plutôt que de se figer après la première apparition, pour qu'un
+ * retour en haut de page puis un nouveau défilement rejoue l'animation.
+ *
  * Décalage en cascade : `--reveal-delay` sur l'élément, posé par l'appelant.
  */
 export function ScrollReveal() {
@@ -30,10 +34,7 @@ export function ScrollReveal() {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add('revele');
-          // Une seule fois : le bloc ne doit pas se re-masquer en remontant.
-          observer.unobserve(entry.target);
+          entry.target.classList.toggle('revele', entry.isIntersecting);
         }
       },
       // Déclenche un peu avant le bas de l'écran, pour que le bloc soit déjà
@@ -42,7 +43,7 @@ export function ScrollReveal() {
     );
 
     const observe = (node: ParentNode) => {
-      for (const element of node.querySelectorAll('[data-reveal]:not(.revele)')) {
+      for (const element of node.querySelectorAll('[data-reveal]')) {
         observer.observe(element);
       }
     };

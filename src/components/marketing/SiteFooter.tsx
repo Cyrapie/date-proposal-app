@@ -2,92 +2,67 @@
 
 import Link from 'next/link';
 
-import { Heart } from '@/components/ui/Heart';
+import { BrandLockup } from '@/components/ui/BrandLogo';
 import { useT } from '@/lib/i18n/use-t';
-import { NAV_LINKS } from '@/lib/marketing/nav';
+import { CTA_HREF } from '@/lib/marketing/nav';
 
-/** Une colonne de liens, avec son titre en petites capitales. */
-function FooterColumn({
-  heading,
-  children,
-}: {
-  heading: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <nav aria-label={heading}>
-      <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-400">{heading}</h2>
-      <ul className="mt-5 space-y-3">{children}</ul>
-    </nav>
-  );
-}
-
-const linkClass = 'text-sm text-ink-600 transition hover:text-bordeaux-500';
-
+/**
+ * Deux bandes au fond distinct plutôt qu'un simple filet interne : c'est le
+ * changement de couleur lui-même qui sépare l'identité (haut) du légal (bas),
+ * pas une ligne de plus à l'intérieur d'un même bloc.
+ */
 export function SiteFooter() {
   const t = useT();
 
   return (
-    <footer className="mt-24 border-t border-cream-300 bg-bordeaux-50">
-      <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:py-20">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] lg:gap-8">
-          <div className="max-w-xs">
-            <div className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-bordeaux-500" />
-              <span className="font-serif text-lg text-ink-900">Keerelle</span>
-            </div>
-            <p className="mt-4 text-sm leading-relaxed text-ink-400">{t.footer.tagline}</p>
-          </div>
+    <footer className="mt-16">
+      <div className="border-t border-cream-300 bg-bordeaux-50">
+        <div className="mx-auto w-full max-w-xl px-5 py-10 text-center sm:py-12">
+          {/* Centré par le `text-center` du conteneur, pas par un `mx-auto`
+              qui n'aurait aucun effet sur un élément `inline-block`. */}
+          <BrandLockup height={30} />
 
-          <FooterColumn heading={t.footer.siteHeading}>
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className={linkClass}>
-                  {t.nav[link.navKey]}
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink-400">
+            {t.footer.tagline}
+          </p>
+
+          <Link
+            href={CTA_HREF}
+            className="mt-5 inline-block rounded-full bg-accent px-7 py-3 text-sm font-semibold text-accent-ink shadow-[0_12px_32px_rgba(109,27,44,0.28)] transition hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-[0_16px_40px_rgba(109,27,44,0.34)] active:translate-y-0 active:scale-[0.99]"
+          >
+            {t.nav.cta}
+          </Link>
+        </div>
+      </div>
+
+      <div className="border-t border-cream-300 bg-cream-200">
+        <div className="mx-auto w-full max-w-xl px-5 py-6 text-center">
+          <nav aria-label={t.footer.legalNavLabel}>
+            <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-ink-400">
+              <li>
+                <Link href="/privacy" className="transition hover:text-bordeaux-500">
+                  {t.footer.privacy}
                 </Link>
               </li>
-            ))}
-          </FooterColumn>
+              <li>
+                <Link href="/regles-communaute" className="transition hover:text-bordeaux-500">
+                  {t.footer.community}
+                </Link>
+              </li>
+              <li>
+                <Link href="/conditions-generales" className="transition hover:text-bordeaux-500">
+                  {t.footer.terms}
+                </Link>
+              </li>
+              <li>
+                <Link href="/mentions-legales" className="transition hover:text-bordeaux-500">
+                  {t.footer.legal}
+                </Link>
+              </li>
+            </ul>
+          </nav>
 
-          <FooterColumn heading={t.footer.accountHeading}>
-            <li>
-              <Link href="/login" className={linkClass}>
-                {t.footer.login}
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard" className={linkClass}>
-                {t.footer.myInvitations}
-              </Link>
-            </li>
-          </FooterColumn>
-
-          <FooterColumn heading={t.footer.legalHeading}>
-            <li>
-              <Link href="/privacy" className={linkClass}>
-                {t.footer.privacy}
-              </Link>
-            </li>
-            <li>
-              <Link href="/regles-communaute" className={linkClass}>
-                {t.footer.community}
-              </Link>
-            </li>
-            <li>
-              <Link href="/conditions-generales" className={linkClass}>
-                {t.footer.terms}
-              </Link>
-            </li>
-            <li>
-              <Link href="/mentions-legales" className={linkClass}>
-                {t.footer.legal}
-              </Link>
-            </li>
-          </FooterColumn>
-        </div>
-
-        <div className="mt-14 flex flex-col-reverse items-center gap-3 border-t border-cream-300 pt-6 text-xs text-ink-400 sm:flex-row sm:justify-between">
-          <p>
+          <p className="mt-2.5 text-xs text-ink-400">
             © {new Date().getFullYear()} Keerelle. {t.footer.rights}
           </p>
         </div>

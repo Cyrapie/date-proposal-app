@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "Keerelle — la clé qui ouvre un moment",
+    default: "Keerelle · la clé qui ouvre un moment",
     template: "%s · Keerelle",
   },
   description:

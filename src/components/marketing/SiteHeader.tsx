@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-import { Heart } from '@/components/ui/Heart';
+import { BrandLockup } from '@/components/ui/BrandLogo';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useT } from '@/lib/i18n/use-t';
@@ -45,13 +45,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-cream-300 bg-cream-100/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-5">
-        <Link
-          href="/"
-          className="flex shrink-0 items-center gap-2 text-ink-900"
-          aria-label={t.nav.homeAria}
-        >
-          <Heart className="h-5 w-5 text-bordeaux-500" />
-          <span className="font-serif text-lg leading-none">Keerelle</span>
+        <Link href="/" className="shrink-0" aria-label={t.nav.homeAria}>
+          <BrandLockup height={26} />
         </Link>
 
         <nav aria-label={t.nav.mainNavLabel} className="hidden lg:block">

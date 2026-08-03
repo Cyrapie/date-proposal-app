@@ -31,14 +31,18 @@ export function BlogTeaserView({ posts }: { posts: Post[] }) {
         </Link>
       </div>
 
-      <div className="mt-10 grid gap-5 md:grid-cols-3">
+      {/* flex + justify-center plutôt qu'une grille à 3 colonnes fixes : avec
+          moins de 3 articles (le cas courant tant que le blog est jeune), une
+          grille laisse les cartes collées à gauche et un vide visible à
+          droite. Ici, une rangée incomplète reste centrée. */}
+      <div className="mt-10 flex flex-wrap justify-center gap-5">
         {posts.map((post, index) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
             data-reveal
             style={{ '--reveal-delay': `${index * 80}ms` } as React.CSSProperties}
-            className="bloc group flex flex-col p-7"
+            className="bloc group flex w-full max-w-sm flex-col p-7 sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)]"
           >
             <p className="text-xs text-ink-400">
               <time dateTime={post.date}>{formatShortDateIn(post.date, lang)}</time>
