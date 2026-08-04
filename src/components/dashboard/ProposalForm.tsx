@@ -25,7 +25,7 @@ import {
 import { suggestionsFor } from '@/lib/domain/countries';
 import { messageSuggestionsFor } from '@/lib/domain/messages';
 import { canCreateGroupInvitations, type PlanId } from '@/lib/domain/pricing';
-import { THEMES, THEME_META, type Theme } from '@/lib/domain/themes';
+import { THEMES, type Theme } from '@/lib/domain/themes';
 import { useLang } from '@/lib/i18n/language';
 import { useT } from '@/lib/i18n/use-t';
 import { useTypeMeta } from '@/lib/i18n/type-meta';
@@ -471,8 +471,6 @@ export function ProposalForm({
         <Field label={t.proposalForm.themeLabel} required>
           <div className="space-y-2">
             {THEMES.map((option) => {
-              // Couleurs côté domaine, libellés côté dictionnaire.
-              const tokens = THEME_META[option].tokens;
               const meta = t.themeMeta[option];
               const selected = option === theme;
               return (
@@ -484,14 +482,13 @@ export function ProposalForm({
                     selected ? 'border-accent bg-bordeaux-50' : 'border-cream-300 bg-cream-50'
                   }`}
                 >
+                  {/* Couleurs lues en CSS (`theme-swatch`, `globals.css`) via
+                      `data-theme` : aperçu fidèle au mode clair/sombre actuel,
+                      sans dupliquer les teintes en JS. */}
                   <span
                     aria-hidden="true"
-                    className="h-8 w-8 shrink-0 rounded-full border"
-                    style={{
-                      background: tokens['--theme-bg'],
-                      borderColor: tokens['--theme-accent'],
-                      boxShadow: `inset 0 0 0 4px ${tokens['--theme-accent']}`,
-                    }}
+                    data-theme={option}
+                    className="theme-swatch h-8 w-8 shrink-0 rounded-full border"
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-ink-900">{meta.label}</span>

@@ -131,12 +131,90 @@ body {
     color 200ms ease;
 }
 
-/* Les écrans du parcours destinataire consomment les tokens du thème choisi,
-   injectés en variables CSS inline sur le conteneur racine. Ils ignorent
-   volontairement le mode sombre. */
+/* Les écrans du parcours destinataire consomment les tokens du thème choisi
+   à la création (posé via `data-theme` sur le conteneur racine, voir
+   `RecipientExperience`), déclinés ci-dessous en clair et en sombre. */
 .themed {
   background: var(--theme-bg);
   color: var(--theme-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Thèmes du parcours destinataire, un jeu de variables par thème et par mode.
+   `.dark` est la même classe que celle posée par `themeBootScript` pour le
+   reste du site : la bascule sombre déjà en place pilote aussi ces couleurs.
+   -------------------------------------------------------------------------- */
+[data-theme='classic'] {
+  --theme-bg: #faf6f0;
+  --theme-surface: #fffdf9;
+  --theme-ink: #2a2320;
+  --theme-muted: #7d6f66;
+  --theme-accent: #6d1b2c;
+  --theme-accent-soft: #f2e3e5;
+  --theme-accent-ink: #fffdf9;
+  --theme-border: #e6dbcd;
+}
+.dark [data-theme='classic'] {
+  --theme-bg: #161113;
+  --theme-surface: #211c1f;
+  --theme-ink: #f7f2ee;
+  --theme-muted: #9a8c86;
+  --theme-accent: #a3283f;
+  --theme-accent-soft: #3d2732;
+  --theme-accent-ink: #fffdf9;
+  --theme-border: #3b3135;
+}
+
+[data-theme='fun'] {
+  --theme-bg: #fff4ec;
+  --theme-surface: #fffaf6;
+  --theme-ink: #3b1f2b;
+  --theme-muted: #8a6072;
+  --theme-accent: #d6336c;
+  --theme-accent-soft: #ffe0ec;
+  --theme-accent-ink: #fffaf6;
+  --theme-border: #ffd9c4;
+}
+.dark [data-theme='fun'] {
+  --theme-bg: #241318;
+  --theme-surface: #2e1a20;
+  --theme-ink: #fbe9ee;
+  --theme-muted: #c9909f;
+  --theme-accent: #ff6b9d;
+  --theme-accent-soft: #4a1f2c;
+  --theme-accent-ink: #2e1a20;
+  --theme-border: #4a2530;
+}
+
+[data-theme='midnight'] {
+  --theme-bg: #151a2d;
+  --theme-surface: #1e2540;
+  --theme-ink: #f3efe7;
+  --theme-muted: #a7aec7;
+  --theme-accent: #c9a227;
+  --theme-accent-soft: #2b3357;
+  --theme-accent-ink: #151a2d;
+  --theme-border: #333c63;
+}
+.dark [data-theme='midnight'] {
+  /* Déjà nocturne par nature : la variante sombre l'approfondit plutôt que
+     de la retourner, contrairement aux deux autres thèmes. */
+  --theme-bg: #0d1020;
+  --theme-surface: #171c33;
+  --theme-ink: #f5f1e8;
+  --theme-muted: #9199bb;
+  --theme-accent: #d4af37;
+  --theme-accent-soft: #232a4a;
+  --theme-accent-ink: #0d1020;
+  --theme-border: #262b47;
+}
+
+/* Aperçu du thème dans le formulaire de création : mêmes variables, pour ne
+   pas dupliquer les couleurs en JS. */
+.theme-swatch {
+  background: var(--theme-bg);
+  border-color: var(--theme-accent);
+  box-shadow: inset 0 0 0 4px var(--theme-accent);
 }
 
 /* --------------------------------------------------------------------------

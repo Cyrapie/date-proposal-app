@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 
 import { CancelForm, InvalidLinkNotice } from '@/components/recipient/CancelForm';
+import { RecipientLanguageToggle } from '@/components/recipient/RecipientLanguageToggle';
+import { RecipientThemeToggle } from '@/components/recipient/RecipientThemeToggle';
 import { getProposalBySlug } from '@/lib/data/proposals';
-import { themeStyle } from '@/lib/domain/themes';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,14 +32,18 @@ export default async function CancelPage({
 
   if (!responseId || !token) {
     return (
-      <main className="themed flex min-h-dvh items-center justify-center px-5" style={themeStyle(proposal.theme)}>
+      <main className="themed flex min-h-dvh items-center justify-center px-5" data-theme={proposal.theme}>
+        <RecipientThemeToggle />
+        <RecipientLanguageToggle />
         <InvalidLinkNotice />
       </main>
     );
   }
 
   return (
-    <main className="themed flex min-h-dvh items-center justify-center px-5 py-12" style={themeStyle(proposal.theme)}>
+    <main className="themed flex min-h-dvh items-center justify-center px-5 py-12" data-theme={proposal.theme}>
+      <RecipientThemeToggle />
+      <RecipientLanguageToggle />
       <CancelForm
         slug={slug}
         responseId={responseId}

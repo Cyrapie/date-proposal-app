@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { StepHeader } from '@/components/recipient/StepHeader';
 import { useT } from '@/lib/i18n/use-t';
@@ -34,6 +34,17 @@ export function CancelForm({
 }) {
   const t = useT();
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+
+  // Le titre statique posé côté serveur ne peut pas suivre la langue,
+  // inconnue à ce stade du rendu. Délai de 50 ms : l'App Router réaffirme le
+  // titre du layout après le premier rendu sur un tick que `setTimeout(fn, 0)`
+  // ne suffit pas à dépasser (vérifié).
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      document.title = `${t.recipient.cancel.title} · Keerelle`;
+    }, 50);
+    return () => window.clearTimeout(id);
+  }, [t]);
 
   async function handleCancel() {
     setStatus('sending');

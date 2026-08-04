@@ -8,10 +8,12 @@ import { DecisionScreen } from '@/components/recipient/DecisionScreen';
 import { EnvelopeScreen } from '@/components/recipient/EnvelopeScreen';
 import { GroupRsvpScreen } from '@/components/recipient/GroupRsvpScreen';
 import { LetterScreen } from '@/components/recipient/LetterScreen';
+import { RecipientLanguageToggle } from '@/components/recipient/RecipientLanguageToggle';
+import { RecipientThemeToggle } from '@/components/recipient/RecipientThemeToggle';
 import { SelectionScreen, type SelectionPayload } from '@/components/recipient/SelectionScreen';
 import type { ConfirmedResponse, PublicProposal } from '@/components/recipient/types';
-import { themeStyle } from '@/lib/domain/themes';
 import { useT } from '@/lib/i18n/use-t';
+import { useTypeMeta } from '@/lib/i18n/type-meta';
 
 type Step = 'envelope' | 'letter' | 'decision' | 'group-rsvp' | 'selection' | 'confirmation';
 
@@ -27,10 +29,44 @@ export function RecipientExperience({
   demo?: boolean;
 }) {
   const t = useT();
+  const typeMeta = useTypeMeta();
   const [step, setStep] = useState<Step>(initialResponse ? 'confirmation' : 'envelope');
   const [response, setResponse] = useState<ConfirmedResponse | null>(initialResponse);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // L'onglet du navigateur reste sur « Keerelle » du début à la fin sinon :
+  // ce n'est pas la page qui change (une seule route), donc Next ne peut pas
+  // le faire à notre place — d'où la mise à jour manuelle à chaque étape.
+  //
+  // Le délai n'est pas cosmétique : au montage, l'App Router réaffirme le
+  // titre statique du layout après le premier rendu, sur un tick plus tardif
+  // qu'un `setTimeout(fn, 0)` — vérifié : 0 ms perd la course, 50 ms la
+  // gagne. Sans lien avec l'affichage, donc imperceptible pour qui lit.
+  useEffect(() => {
+    const waitlisted = response?.group?.status === 'waitlisted';
+    const title =
+      step === 'envelope'
+        ? t.recipient.envelope.title
+        : step === 'letter'
+          ? typeMeta(proposal.type).headline
+          : step === 'decision'
+            ? t.recipient.decision.title
+            : step === 'group-rsvp'
+              ? t.recipient.group.title
+              : step === 'selection'
+                ? t.recipient.selection.title
+                : waitlisted
+                  ? t.recipient.confirmation.titleWaitlisted
+                  : response?.countered
+                    ? t.recipient.confirmation.titleCountered
+                    : t.recipient.confirmation.title;
+
+    const id = window.setTimeout(() => {
+      document.title = `${title} · Keerelle`;
+    }, 50);
+    return () => window.clearTimeout(id);
+  }, [step, response, proposal.type, t, typeMeta]);
 
   // Le statut passe à « vue » dès l'ouverture du lien, avant toute interaction.
   useEffect(() => {
@@ -97,7 +133,10 @@ export function RecipientExperience({
   }
 
   return (
-    <main className="themed min-h-dvh" style={themeStyle(proposal.theme)}>
+    <main className="themed min-h-dvh" data-theme={proposal.theme}>
+      <RecipientThemeToggle />
+      <RecipientLanguageToggle />
+
       <AnimatePresence mode="wait">
         {step === 'envelope' ? (
           <EnvelopeScreen

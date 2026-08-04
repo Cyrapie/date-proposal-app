@@ -1,6 +1,8 @@
 'use client';
 
-import { themeStyle, type Theme } from '@/lib/domain/themes';
+import { RecipientLanguageToggle } from '@/components/recipient/RecipientLanguageToggle';
+import { RecipientThemeToggle } from '@/components/recipient/RecipientThemeToggle';
+import type { Theme } from '@/lib/domain/themes';
 import { useT } from '@/lib/i18n/use-t';
 
 export function ExpiredLink({ theme }: { theme: Theme }) {
@@ -9,8 +11,10 @@ export function ExpiredLink({ theme }: { theme: Theme }) {
   return (
     <main
       className="themed flex min-h-dvh flex-col items-center justify-center px-6 py-12 text-center"
-      style={themeStyle(theme)}
+      data-theme={theme}
     >
+      <RecipientThemeToggle />
+      <RecipientLanguageToggle />
       <div className="max-w-sm">
         <p className="font-serif text-5xl" aria-hidden="true">
           🕰️
