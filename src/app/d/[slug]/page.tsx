@@ -79,27 +79,44 @@ export default async function ProposalPage({
   const existingResponse = proposal.responses[0];
 
   if (!isGroup && existingResponse) {
-    const slot = proposal.slots.find((item) => item.id === existingResponse.chosen_slot_id);
-    const location = proposal.locations.find(
-      (item) => item.id === existingResponse.chosen_location_id,
-    );
+    // Une contre-proposition n'a pas de créneau parmi ceux offerts
+    // (`chosen_slot_id` est nul) : sans ce cas, la recherche du créneau
+    // échouait silencieusement et la page repartait du tout début du
+    // parcours à chaque réouverture, alors que la réponse existait bien.
+    const countered = Boolean(existingResponse.proposed_start && existingResponse.proposed_end);
+    const slot = countered
+      ? null
+      : (proposal.slots.find((item) => item.id === existingResponse.chosen_slot_id) ?? null);
+    const location = countered
+      ? null
+      : (proposal.locations.find((item) => item.id === existingResponse.chosen_location_id) ??
+        null);
 
-    if (slot) {
+    if (countered || slot) {
+      const start = countered ? new Date(existingResponse.proposed_start!) : new Date(slot!.start_time);
+      const end = countered ? new Date(existingResponse.proposed_end!) : new Date(slot!.end_time);
+      const locationLabel = countered ? existingResponse.proposed_location : (location?.label ?? null);
+      const locationAddress = countered ? null : (location?.address ?? null);
+
       initialResponse = {
-        countered: false,
-        slot: { start: slot.start_time, end: slot.end_time },
-        location: location
-          ? { label: location.label, address: location.address, mapUrl: mapsUrl(location) }
-          : null,
+        countered,
+        slot: { start: start.toISOString(), end: end.toISOString() },
+        location: countered
+          ? existingResponse.proposed_location
+            ? { label: existingResponse.proposed_location, address: null }
+            : null
+          : location
+            ? { label: location.label, address: location.address, mapUrl: mapsUrl(location) }
+            : null,
         note: existingResponse.recipient_note,
         icsUrl: `/api/d/${proposal.slug}/ics?r=${existingResponse.id}`,
         googleCalendarUrl: googleCalendarUrl({
           type: proposal.type,
           recipientName: proposal.recipient_name,
-          start: new Date(slot.start_time),
-          end: new Date(slot.end_time),
-          locationLabel: location?.label ?? null,
-          locationAddress: location?.address ?? null,
+          start,
+          end,
+          locationLabel,
+          locationAddress,
           note: existingResponse.recipient_note,
           url: proposalUrl(publicEnv.siteUrl, proposal.slug),
         }),
