@@ -106,6 +106,7 @@ export default async function DashboardPage() {
       ) : (
         <Link
           href="/dashboard/new"
+          data-track-link="cta-dashboard-new"
           className="mt-4 flex w-full items-center justify-center rounded-full bg-accent px-6 py-3.5 text-base font-medium text-accent-ink transition hover:bg-accent-hover active:scale-[0.99]"
         >
           Créer une invitation

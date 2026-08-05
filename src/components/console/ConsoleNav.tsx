@@ -7,6 +7,7 @@ export const CONSOLE_LINKS = [
   { href: '/console', label: 'Vue d’ensemble' },
   { href: '/console/utilisateurs', label: 'Utilisateurs' },
   { href: '/console/invitations', label: 'Invitations' },
+  { href: '/console/analytics', label: 'Analytics' },
   { href: '/console/journal', label: 'Journal' },
   { href: '/console/systeme', label: 'Système' },
 ] as const;

@@ -49,6 +49,18 @@ export type ConsoleAuditEntry = {
   createdAt: string;
 };
 
+export type ConsoleAnalyticsOverview = {
+  totalPageViews: number;
+  uniqueVisitors: number;
+  totalLinkClicks: number;
+  trendDaily: { day: string; pageViews: number }[];
+};
+
+export type ConsoleAnalyticsTopItem = {
+  label: string;
+  value: number;
+};
+
 export type ConsoleHealth = {
   dbTime: string;
   usersTotal: number;
@@ -220,6 +232,55 @@ export async function getConsoleHealth(): Promise<ConsoleHealth | null> {
     lastResponseAt: raw.last_response_at ? String(raw.last_response_at) : null,
     lastAuditAt: raw.last_audit_at ? String(raw.last_audit_at) : null,
   };
+}
+
+// --------------------------------------------------------------- Analytics
+
+export async function getConsoleAnalyticsOverview(days = 30): Promise<ConsoleAnalyticsOverview | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.rpc('console_analytics_overview', { p_days: days });
+
+  if (error || !data) {
+    console.error('[console] Vue d’ensemble analytics indisponible', error);
+    return null;
+  }
+
+  const raw = data as {
+    total_page_views: number;
+    unique_visitors: number;
+    total_link_clicks: number;
+    trend_daily: { day: string; page_views: number }[];
+  };
+
+  return {
+    totalPageViews: Number(raw.total_page_views),
+    uniqueVisitors: Number(raw.unique_visitors),
+    totalLinkClicks: Number(raw.total_link_clicks),
+    trendDaily: raw.trend_daily.map((point) => ({
+      day: point.day,
+      pageViews: Number(point.page_views),
+    })),
+  };
+}
+
+export async function listConsoleAnalyticsTop(
+  eventType: 'page_view' | 'section_view' | 'link_click',
+  days = 30,
+  limit = 10,
+): Promise<ConsoleAnalyticsTopItem[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.rpc('console_analytics_top', {
+    p_event_type: eventType,
+    p_days: days,
+    p_limit: limit,
+  });
+
+  if (error || !data) {
+    console.error('[console] Classement analytics indisponible', error);
+    return [];
+  }
+
+  return data.map((row) => ({ label: row.label, value: Number(row.value) }));
 }
 
 // ------------------------------------------------------------------ Journal

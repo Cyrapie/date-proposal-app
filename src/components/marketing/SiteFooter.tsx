@@ -28,6 +28,7 @@ export function SiteFooter() {
 
           <Link
             href={CTA_HREF}
+            data-track-link="cta-footer"
             className="mt-5 inline-block rounded-full bg-accent px-7 py-3 text-sm font-semibold text-accent-ink shadow-[0_12px_32px_rgba(109,27,44,0.28)] transition hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-[0_16px_40px_rgba(109,27,44,0.34)] active:translate-y-0 active:scale-[0.99]"
           >
             {t.nav.cta}
@@ -40,22 +41,38 @@ export function SiteFooter() {
           <nav aria-label={t.footer.legalNavLabel}>
             <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-ink-400">
               <li>
-                <Link href="/privacy" className="transition hover:text-bordeaux-500">
+                <Link
+                  href="/privacy"
+                  data-track-link="footer-privacy"
+                  className="transition hover:text-bordeaux-500"
+                >
                   {t.footer.privacy}
                 </Link>
               </li>
               <li>
-                <Link href="/regles-communaute" className="transition hover:text-bordeaux-500">
+                <Link
+                  href="/regles-communaute"
+                  data-track-link="footer-community"
+                  className="transition hover:text-bordeaux-500"
+                >
                   {t.footer.community}
                 </Link>
               </li>
               <li>
-                <Link href="/conditions-generales" className="transition hover:text-bordeaux-500">
+                <Link
+                  href="/conditions-generales"
+                  data-track-link="footer-terms"
+                  className="transition hover:text-bordeaux-500"
+                >
                   {t.footer.terms}
                 </Link>
               </li>
               <li>
-                <Link href="/mentions-legales" className="transition hover:text-bordeaux-500">
+                <Link
+                  href="/mentions-legales"
+                  data-track-link="footer-legal"
+                  className="transition hover:text-bordeaux-500"
+                >
                   {t.footer.legal}
                 </Link>
               </li>

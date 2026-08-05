@@ -32,6 +32,10 @@ export function InquiryForm({
   const handleToken = useCallback((token: string | null) => setTurnstileToken(token), []);
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
+  // Change de valeur force le remontage du widget (via `key`) après un échec :
+  // un jeton Turnstile est à usage unique, renvoyer le même après une erreur
+  // serveur échouerait avec « timeout-or-duplicate » plutôt que de retenter.
+  const [turnstileAttempt, setTurnstileAttempt] = useState(0);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,6 +59,8 @@ export function InquiryForm({
     } catch (caught) {
       setStatus('error');
       setError(caught instanceof Error ? caught.message : t.inquiryForm.genericError);
+      setTurnstileToken(null);
+      setTurnstileAttempt((n) => n + 1);
     }
   }
 
@@ -140,7 +146,7 @@ export function InquiryForm({
         />
       </div>
 
-      <Turnstile onToken={handleToken} />
+      <Turnstile key={turnstileAttempt} onToken={handleToken} />
 
       {error ? (
         <p role="alert" className="rounded-xl bg-bordeaux-50 p-4 text-sm text-bordeaux-700">

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 
+import { LinkClickTracker } from "@/components/analytics/LinkClickTracker";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 import { themeBootScript } from "@/components/ui/ThemeToggle";
 import { languageBootScript } from "@/lib/i18n/language";
 import "./globals.css";
@@ -61,7 +63,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <script dangerouslySetInnerHTML={{ __html: languageBootScript }} />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <PageViewTracker />
+        <LinkClickTracker />
+        {children}
+      </body>
     </html>
   );
 }

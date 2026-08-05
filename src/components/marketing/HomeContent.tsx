@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { TrackSection } from '@/components/analytics/TrackSection';
 import { Benefits } from '@/components/marketing/Benefits';
 import { Faq } from '@/components/marketing/Faq';
 import { OccasionCarousel } from '@/components/marketing/OccasionCarousel';
@@ -40,12 +41,14 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={CTA_HREF}
+                  data-track-link="cta-hero-primary"
                   className="rounded-full bg-accent px-8 py-4 text-center text-base font-semibold text-accent-ink shadow-[0_12px_32px_rgba(109,27,44,0.28)] transition hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-[0_16px_40px_rgba(109,27,44,0.34)] active:translate-y-0 active:scale-[0.99]"
                 >
                   {t.nav.cta}
                 </Link>
                 <Link
                   href="/a-propos"
+                  data-track-link="cta-hero-secondary"
                   className="rounded-full border border-cream-300 bg-cream-50 px-8 py-4 text-center text-base font-medium text-bordeaux-600 transition hover:-translate-y-0.5 hover:border-bordeaux-500 hover:bg-bordeaux-50"
                 >
                   {t.home.ctaHow}
@@ -82,46 +85,54 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
       </section>
 
       {/* ------------------------------------------------------- Pourquoi nous */}
-      <Benefits />
+      <TrackSection id="home-benefits" label="Pourquoi nous">
+        <Benefits />
+      </TrackSection>
 
       {/* -------------------------------------------------------- Comment faire */}
-      <section className="bg-bordeaux-50 py-20">
-        <div className="mx-auto w-full max-w-6xl px-5">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-bordeaux-500">
-            {t.home.stepsEyebrow}
-          </p>
-          <h2 className="mt-4 max-w-xl font-serif text-4xl font-black leading-[1.06] text-ink-900 sm:text-5xl">
-            {t.home.stepsTitle}
-          </h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-600">{t.home.stepsBody}</p>
+      <TrackSection id="home-comment-faire" label="Comment faire">
+        <section className="bg-bordeaux-50 py-20">
+          <div className="mx-auto w-full max-w-6xl px-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-bordeaux-500">
+              {t.home.stepsEyebrow}
+            </p>
+            <h2 className="mt-4 max-w-xl font-serif text-4xl font-black leading-[1.06] text-ink-900 sm:text-5xl">
+              {t.home.stepsTitle}
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-600">{t.home.stepsBody}</p>
 
-          <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {t.home.steps.map((step, index) => (
-              <li
-                key={step.title}
-                data-reveal
-                style={{ '--reveal-delay': `${index * 80}ms` } as React.CSSProperties}
-                className="bloc bloc-plein p-7"
-              >
-                <span data-fixe className="pastille flex h-10 w-10 items-center justify-center rounded-2xl bg-accent font-serif text-lg text-accent-ink">
-                  {index + 1}
-                </span>
-                <h3 className="mt-5 font-serif text-xl font-bold text-ink-900">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-600">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+            <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {t.home.steps.map((step, index) => (
+                <li
+                  key={step.title}
+                  data-reveal
+                  style={{ '--reveal-delay': `${index * 80}ms` } as React.CSSProperties}
+                  className="bloc bloc-plein p-7"
+                >
+                  <span data-fixe className="pastille flex h-10 w-10 items-center justify-center rounded-2xl bg-accent font-serif text-lg text-accent-ink">
+                    {index + 1}
+                  </span>
+                  <h3 className="mt-5 font-serif text-xl font-bold text-ink-900">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-600">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      </TrackSection>
 
       {/* ----------------------------------------------------------- Témoignages */}
-      <Testimonials />
+      <TrackSection id="home-testimonials" label="Témoignages">
+        <Testimonials />
+      </TrackSection>
 
       {/* ------------------------------------------------------------- Articles */}
       {blogTeaser}
 
       {/* ------------------------------------------------------------------ FAQ */}
-      <Faq items={t.homeFaq} />
+      <TrackSection id="home-faq" label="FAQ">
+        <Faq items={t.homeFaq} />
+      </TrackSection>
 
       {/* ------------------------------------------------------ Appel à l'action */}
       <section className="mx-auto w-full max-w-6xl px-5 pb-4">
@@ -139,6 +150,7 @@ export function HomeContent({ blogTeaser }: { blogTeaser: ReactNode }) {
           <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-accent-ink/85">{t.home.ctaBody}</p>
           <Link
             href={CTA_HREF}
+            data-track-link="cta-final"
             className="mt-8 inline-block rounded-full bg-cream-50 px-10 py-4 text-base font-semibold text-bordeaux-700 transition hover:-translate-y-0.5 hover:bg-bordeaux-50 active:translate-y-0 active:scale-[0.99]"
           >
             {t.nav.cta}

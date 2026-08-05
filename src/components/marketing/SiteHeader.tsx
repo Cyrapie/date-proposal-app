@@ -56,6 +56,7 @@ export function SiteHeader() {
                 <Link
                   href={link.href}
                   aria-current={isActive(link.href) ? 'page' : undefined}
+                  data-track-link={`nav-${link.navKey}`}
                   className={`text-sm transition hover:text-ink-900 ${
                     isActive(link.href)
                       ? 'font-medium text-ink-900'
@@ -75,6 +76,7 @@ export function SiteHeader() {
 
           <Link
             href={CTA_HREF}
+            data-track-link="cta-header"
             className="hidden rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-ink transition hover:bg-accent-hover active:scale-[0.98] sm:block"
           >
             {t.nav.cta}
@@ -117,6 +119,7 @@ export function SiteHeader() {
                       href={link.href}
                       onClick={close}
                       aria-current={isActive(link.href) ? 'page' : undefined}
+                      data-track-link={`nav-mobile-${link.navKey}`}
                       className={`block rounded-xl px-3 py-3 text-base transition ${
                         isActive(link.href)
                           ? 'bg-bordeaux-50 font-medium text-bordeaux-600'
@@ -132,6 +135,7 @@ export function SiteHeader() {
               <Link
                 href={CTA_HREF}
                 onClick={close}
+                data-track-link="cta-header-mobile"
                 className="mt-3 block rounded-full bg-accent px-6 py-3.5 text-center text-base font-medium text-accent-ink sm:hidden"
               >
                 {t.nav.cta}

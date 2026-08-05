@@ -35,6 +35,18 @@ export type AdminAuditLogRow = {
   created_at: string;
 };
 
+export type AnalyticsEventRow = {
+  id: string;
+  event_type: 'page_view' | 'section_view' | 'link_click';
+  path: string;
+  target_id: string | null;
+  target_label: string | null;
+  target_href: string | null;
+  visitor_id: string;
+  user_id: string | null;
+  created_at: string;
+};
+
 export type ProposalRow = {
   id: string;
   creator_id: string;
@@ -129,6 +141,11 @@ export type Database = {
         Omit<AdminAuditLogRow, 'id' | 'created_at'> &
           Partial<Pick<AdminAuditLogRow, 'id' | 'created_at'>>
       >;
+      analytics_events: Table<
+        AnalyticsEventRow,
+        Omit<AnalyticsEventRow, 'id' | 'created_at'> &
+          Partial<Pick<AnalyticsEventRow, 'id' | 'created_at'>>
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -163,6 +180,14 @@ export type Database = {
       console_system_health: {
         Args: Record<string, never>;
         Returns: unknown;
+      };
+      console_analytics_overview: {
+        Args: { p_days?: number };
+        Returns: unknown;
+      };
+      console_analytics_top: {
+        Args: { p_event_type: string; p_days?: number; p_limit?: number };
+        Returns: { label: string; value: number }[];
       };
       console_log_action: {
         Args: {
